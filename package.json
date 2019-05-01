@@ -1,0 +1,39 @@
+{
+  "name": "cb-ci-api-cli",
+  "version": "0.0.1",
+  "description": "CloudBeat API CLI wrapper based on Node JS",
+  "main": "build/cli.js",
+  "scripts": {
+    "build": "babel src -d build",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/cli.js"
+  },
+  "bin": {
+    "cloudbeat-cli": "build/cli.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oxygenhq/cb-ci-api-cli.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/oxygenhq/cb-ci-api-cli/issues"
+  },
+  "homepage": "https://github.com/oxygenhq/cb-ci-api-cli#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "esm": "^3.2.22",
+    "junit-report-builder": "^1.3.2",
+    "lodash": "^4.17.11",
+    "minimist": "^1.2.0",
+    "moment": "^2.24.0",
+    "ora": "^3.4.0",
+    "util": "^0.11.1",
+    "when": "^3.7.8"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0"
+  }
+}
