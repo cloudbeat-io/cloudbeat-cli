@@ -43,8 +43,6 @@ JUnitXmlReporter.prototype.generate = function() {
     } else {
         console.warn('method field is required');
     }
-    console.log('this.options', this.options);
-    console.log('this.results', this.results);
 
     return;
 
@@ -64,7 +62,7 @@ JUnitXmlReporter.prototype.generate = function() {
 };
 function populateTestRunResult(result, builder) {
     const data = result.data;
-
+    
     var suite = builder.testSuite()
     .name(data.runId);
 
