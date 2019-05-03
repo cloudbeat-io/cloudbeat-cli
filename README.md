@@ -16,7 +16,7 @@ Just run ```node src/cli.js fake --method=get_run_status --id=c0310c37190140b5a6
 ## Real server:
 
 #### Run test:
-* short(time) test sample : ```node src/cli.js --method=start_test --id=[id] --accountKey=[accountKey] --apiKey=[apiKey]```
+test sample : ```node src/cli.js --method=start_test --id=[id] --accountKey=[accountKey] --apiKey=[apiKey]```
 
 #### Get test status:
 Just run ```node src/cli.js fake --method=get_run_status --id=[id] --accountKey=[accountKey] --apiKey=[apiKey]```
