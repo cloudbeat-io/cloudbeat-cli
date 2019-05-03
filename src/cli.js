@@ -302,13 +302,15 @@ function startRealTest(id){
                 spinner.text = loaderString;
 
                 const runStatus = getRunStatus(response.data.data.runId, false);
-
+             
                 if(runStatus instanceof Promise){
                     runStatus.then((result)=>{
-                        if(typeof spinner !== 'undefined'){
-                            spinner.fail(result.error);
-                        } else {
-                            console.error(result.error);
+                        if(result && result.error){
+                            if(typeof spinner !== 'undefined'){
+                                spinner.fail(result.error);
+                            } else {
+                                console.error(result.error);
+                            }
                         }
 
                         if(result && result.data && result.data.data && result.data.data && result.data.data.data.status){
@@ -505,10 +507,13 @@ if(argv){
 
                 if(runStatus instanceof Promise){
                     runStatus.then((result)=>{
-                        if(typeof spinner !== 'undefined'){
-                            spinner.fail(result.error);
-                        } else {
-                            console.error(result.error);
+                        
+                        if(result && result.error){
+                            if(typeof spinner !== 'undefined'){
+                                spinner.fail(result.error);
+                            } else {
+                                console.error(result.error);
+                            }
                         }
 
                         if(result && result.data && result.data.data){
