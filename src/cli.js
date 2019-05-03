@@ -39,9 +39,27 @@ const FAKE_HOST = 'http://localhost:5000';
 let HOST = 'http://eqa.cloudbeat.io';
 const POOLING_INTERVAL = 1000;
 let spinner;
+let textCache;
 let intervalHandler;
 let accountKey;
 let apiKey;
+
+function nextText(text){
+    if(textCache === text){
+        // ignore
+    } else {
+        if(textCache){
+            if(typeof spinner !== 'undefined'){
+                spinner = spinner.info(textCache);
+                spinner.start(text);
+                textCache = text;
+            }
+        } else {
+            spinner.start(text);
+            textCache = text;
+        }
+    }
+}
 
 function checkDataForError(data){
     if(data && typeof data.success !== 'undefined' && data.success === false){
@@ -56,7 +74,42 @@ function checkDataForError(data){
     }
 }
 
-function saveTestRunResults(result) {
+function getRunResult(runId) {
+    return axios.get(HOST+'/results/api/results/run/'+runId, {
+        params: {
+            accountKey: accountKey,
+            apiKey: apiKey,
+            noInstances: true
+        }
+    })
+    .then(function (response) {
+        checkDataForError(response.data);
+        return { data: response, error: null };
+    })
+    .catch(function (error) {
+        return { data: null, error: error.message };
+    })
+    .then(function (result) {
+        return result;
+    });
+}
+
+function saveTestRunResults(result) {    
+    if(result && result.data && result.data.runId){
+        const runResult = getRunResult(result.data.runId)
+        
+        if(runResult instanceof Promise){
+            runResult.then((result)=>{
+                if(result && result.data && result.data.data && result.data.data.data){
+                    reportResult(result.data.data.data);
+                }
+            });
+        }
+    }
+}
+
+function reportResult(result) {
+    
     // try to dynamically load reporter class based on reporter format name received from the user
     var ReporterClass = null;
     try {
@@ -88,10 +141,11 @@ function saveTestRunResults(result) {
 
     // serialize test results to XML and save to file
     try {
+
         var reporter = new ReporterClass(result, reporterOpt);
         var resultFilePath = reporter.generate();
         console.log('Results XLM saved to: ' + resultFilePath);
-
+        
         
         // save XML to ZIP
         if(folder && resultFilePath){
@@ -112,7 +166,11 @@ function saveTestRunResults(result) {
                 
                 output.on('close', function() {
                     console.log('Results ZIP saved to:', pathToArchive);
-                    process.exit(0);
+                    if(result.isSuccess){
+                        process.exit(0);
+                    } else {
+                        process.exit(1);
+                    }
                 });
                 
                 archive.on('warning', function(err) {
@@ -143,7 +201,11 @@ function saveTestRunResults(result) {
                 process.exit(1);
             }
         } else {
-            process.exit(0);
+            if(result.isSuccess){
+                process.exit(0);
+            } else {
+                process.exit(1);
+            }
         }
     } catch (err) {
         console.error("Can't save results to file: " + err.message);
@@ -153,31 +215,7 @@ function saveTestRunResults(result) {
 
 function handlePooling(suiteId, runId){
     if(params && params.fake && suiteId && runId){
-        return axios.get(FAKE_HOST+'/suites/data/suite/'+suiteId+'/run/'+runId+'/1556519661', {})
-        .then(function (response) {
-            if(response.data.data.status === "Running"){
-                spinner.text = "Running ";
-            }
-
-            if(response.data.data.status === "Finished"){
-                spinner.succeed('test with run id: '+ response.data.data.runId +' finished successful');
-                if(intervalHandler){
-                    clearInterval(intervalHandler);
-                    saveTestRunResults(response.data);
-                }
-            }
-        })
-        .catch(function (error) {
-            if(error.response.status === 304){
-                spinner.text = "Running";
-                // not modified
-            } else {
-                console.log('error', error);
-            }
-        })
-        .then(function (result) {
-            return result;
-        });
+        // not support now
     } else {
         // todo need info about url
     }
@@ -185,31 +223,7 @@ function handlePooling(suiteId, runId){
 
 function handleRealPooling(suiteId, runId){
     if(params && params.fake && suiteId && runId){
-        return axios.get(FAKE_HOST+'/runs/api/run/'+runId+'/1556519661', {})
-        .then(function (response) {
-            if(response.data.data.status === "Running"){
-                spinner.text = "Running ";
-            }
-
-            if(response.data.data.status === "Finished"){
-                spinner.succeed('test with run id: '+ response.data.data.runId +' finished successful');
-                if(intervalHandler){
-                    clearInterval(intervalHandler);
-                    saveTestRunResults(response.data);
-                }
-            }
-        })
-        .catch(function (error) {
-            if(error.response.status === 304){
-                spinner.text = "Running";
-                // not modified
-            } else {
-                console.log('error', error);
-            }
-        })
-        .then(function (result) {
-            return result;
-        });
+        // not support now
     } else {
         return axios.get(HOST+'/runs/api/run/'+runId+'/', {
             params: {
@@ -239,18 +253,21 @@ function handleRealPooling(suiteId, runId){
                 }
                 
                 if(typeof spinner !== 'undefined'){
-                    spinner.text = spinnerNewText;
+                    nextText(spinnerNewText);
+                    // spinner.text = spinnerNewText;
                 }
 
                 startPoolingRunStatus(id, response.data.data.runId);
             }
             
-
-                        
-            if(status ===statuses.Finished){
+       
+            if(status === statuses.Finished){
                 if(typeof spinner !== 'undefined'){
                     spinner.succeed('test with run id: '+ response.data.data.runId +' finished successful');
                     saveTestRunResults(response.data);
+                    if(intervalHandler){
+                        clearInterval(intervalHandler);
+                    }
                 }
             }
                             
@@ -278,7 +295,7 @@ function handleRealPooling(suiteId, runId){
 
 function startPoolingRunStatus(suiteId, runId){
     if(params && params.fake){
-        intervalHandler = setInterval(() => { handlePooling(suiteId, runId) }, POOLING_INTERVAL);
+        // not support now
     } else {
         intervalHandler = setInterval(() => { handleRealPooling(suiteId, runId) }, POOLING_INTERVAL);
     }
@@ -287,7 +304,8 @@ function startPoolingRunStatus(suiteId, runId){
 function startRealTest(id){
         
     let loaderString = 'Trying to run test with suite id: '+ id;
-    spinner = ora(loaderString).start();
+    spinner = ora().start();
+    nextText(loaderString);
 
     axios.post(HOST+'/suites/api/suite/'+id+'/run', {
         accountKey: accountKey,
@@ -299,8 +317,8 @@ function startRealTest(id){
             if(response.data && response.data.data && response.data.data.runId){
 
                 loaderString = 'Started test with run id: '+ response.data.data.runId;
-                spinner.text = loaderString;
-
+                nextText(loaderString);
+                // spinner.text = loaderString;
                 const runStatus = getRunStatus(response.data.data.runId, false);
              
                 if(runStatus instanceof Promise){
@@ -319,7 +337,8 @@ function startRealTest(id){
                             if([statuses.Pending, statuses.Initializing, statuses.Running, statuses.Canceling].includes(status)){
                                 
                                 if(typeof spinner !== 'undefined'){
-                                    spinner.text = status;
+                                    nextText(status);
+                                    // spinner.text = status;
                                 }
 
                                 startPoolingRunStatus(id, response.data.data.runId);
@@ -370,67 +389,7 @@ function startRealTest(id){
 
 function startTest(id){
     if(params && params.fake){
-        let loaderString = 'Trying to run test with suite id: '+ id;
-        spinner = ora(loaderString).start();
-
-        axios.post(FAKE_HOST+'/suites/data/suite/'+id+'/run', {})
-          .then(function (response) {
-            if(response.status === 200){
-                if(response.data && response.data.data && response.data.data.runId){
-                    loaderString = 'Started test with run id: '+ response.data.data.runId;
-                    spinner.text = loaderString;
-
-                    const runStatus = getRunStatus(response.data.data.runId, false);
-                    if(runStatus instanceof Promise){
-                        runStatus.then((result)=>{
-                            if(result && result.error){
-                                if(typeof spinner !== 'undefined'){
-                                    spinner.fail(result.error);
-                                } else {
-                                    console.error(result.error);
-                                }
-                                process.exit(1);
-                            }
-
-                            if(result && result.data && result.data.data && result.data.data && result.data.data.data.status){
-                                const status = result.data.data.data.status;
-                                if(status === 'Finished'){
-                                    if(typeof spinner !== 'undefined'){
-                                        spinner.succeed('test with run id: '+ response.data.data.runId +' finished successful');
-                                        saveTestRunResults(response.data.data);
-                                    }
-                                } else if(status === 'Initializing'){
-                                    startPoolingRunStatus(id, response.data.data.runId);
-                                } else {
-                                    if(typeof spinner !== 'undefined'){
-                                        spinner.text = status;
-                                    }
-                                }
-                            } else {
-                                if(typeof spinner !== 'undefined'){
-                                    spinner.fail(response.data);
-                                }             
-                                console.warn('bad result', result);
-                                process.exit(1);                               
-                            }
-                        })
-                    } else {
-                      console.warn('bad run status result', runStatus);
-                      process.exit(1);
-                    }
-                } else {
-                    console.warn('bad response.data', response.data);
-                    process.exit(1);
-                }
-            } else {
-                console.warn('bad response.status', response.status);
-                process.exit(1);
-            }
-          })
-          .catch(function (error) {
-            console.error('error', error.message);
-            process.exit(1);
-          });
+        // not support now
     } else {
         startRealTest(id);
     }

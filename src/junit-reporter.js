@@ -10,7 +10,7 @@
 /*
  * Oxygen JUnit XML Reporter
  */
-const builder = require('junit-report-builder');
+const builder = require('./../junit-report-builder');
 const path = require('path');
 const _ = require('lodash');
 
@@ -31,6 +31,7 @@ JUnitXmlReporter.prototype.generate = function() {
         this.replaceScreenshotsWithFiles(resultFolderPath);
 
         const method = this.options.method;
+
         if(method === "saveTestRunResults"){
             populateTestRunResult(this.results, builder);
 
@@ -60,59 +61,67 @@ JUnitXmlReporter.prototype.generate = function() {
 
     return resultFilePath;
 };
-function populateTestRunResult(result, builder) {
-    const data = result.data;
-    
+function populateTestRunResult(obj, builder) {
+
+    const data = obj.result;
+
+    // console.log('obj', obj);
+    // console.log('\n\n\n');
+    // console.log('data', data);
+    // console.log('\n\n\n');
+    // console.log('obj.cases', obj.cases);
+
     var suite = builder.testSuite()
-    .name(data.runId);
+    .time(data.duration)
+    .id(data.id)
+    .name(data.testName);
 
-    if(data && data.instances){
-        _.each(data.instances, function(value, key) {            
-            if(value.status === "Finished"){
+    if(obj && obj.cases){
+        obj.cases.map(item => {            
+            if(item.isSuccess){
                 var testCase = suite.testCase()
-                .name(value.id)
+                .id(item.testCaseId)
+                .name(item.caseName)
             } else {
-                var testCase = suite.testCase().
-                name(value.id)
+                var testCase = suite.testCase()
+                .id(item.testCaseId)
+                .name(item.caseName)
                 .failure();
-            }            
-        });
-
+            }  
+        })
     }
 }
 
 
 function populateSuiteResults(result, builder) {
 
-    console.log('populateSuiteResults', builder);
-
     var suite = builder.testSuite().name(result.data.runId);
-    _.each(result.iterations, function(outerIt) {
-        _.each(outerIt.testcases, function(testcase) {
-            var testCase = suite.testCase().name(testcase._name);
-            testCase.time(testcase._duration ? testcase._duration / 1000 : 0);
-            _.each(testcase.iterations, function(innerIt) {
-                var lastFailedStep = null;
-                _.each(innerIt.steps, function(step) {
-                    if (step._status === 'failed') {
-                        lastFailedStep = step;
-                    }
-                    else {
-                        lastFailedStep = null;
-                    }
-                });
-                if (lastFailedStep) {
-                    var message = lastFailedStep.failure._type || '';
-                    message += lastFailedStep.failure._message ? (' - ' + lastFailedStep.failure._message) : '';
-                    message += lastFailedStep.failure._line ? ' at line ' + lastFailedStep.failure._line : '';
-                    if (message === '') {
-                        message = null;
-                    }
-                    testCase.failure(message);
-                }
-            });
-        });
-    });
+    // _.each(result.iterations, function(outerIt) {
+    //     _.each(outerIt.testcases, function(testcase) {
+    //         var testCase = suite.testCase().name(testcase._name);
+    //         testCase.time(testcase._duration ? testcase._duration / 1000 : 0);
+    //         _.each(testcase.iterations, function(innerIt) {
+    //             var lastFailedStep = null;
+    //             _.each(innerIt.steps, function(step) {
+    //                 if (step._status === 'failed') {
+    //                     lastFailedStep = step;
+    //                 }
+    //                 else {
+    //                     lastFailedStep = null;
+    //                 }
+    //             });
+    //             if (lastFailedStep) {
+    //                 var message = lastFailedStep.failure._type || '';
+    //                 message += lastFailedStep.failure._message ? (' - ' + lastFailedStep.failure._message) : '';
+    //                 message += lastFailedStep.failure._line ? ' at line ' + lastFailedStep.failure._line : '';
+    //                 if (message === '') {
+    //                     message = null;
+    //                 }
+    //                 testCase.failure(message);
+    //             }
+    //         });
+    //     });
+    // });
 }
 
 module.exports = JUnitXmlReporter;

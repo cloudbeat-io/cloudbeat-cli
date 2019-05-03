@@ -68,17 +68,20 @@ ReporterFileBase.prototype.replaceScreenshotsWithFiles = function(folderPath) {
     var stepsWithScreenshot = [];
     // map steps with non empty screenshot attribute
     _.each(this.results, function(resultSet) {
-        _.each(resultSet.iterations, function(outerIt) {
-            _.each(outerIt.testcases, function(testcase) {
-                _.each(testcase.iterations, function(innerIt) {
-                    _.each(innerIt.steps, function(step) {
-                        if (step.screenshot) {
-                            stepsWithScreenshot.push(step);
-                        }
-                    });
-                });
-            });
-        });
+
+        // console.log('resultSet', resultSet);
+
+        // _.each(resultSet.iterations, function(outerIt) {
+        //     _.each(outerIt.testcases, function(testcase) {
+        //         _.each(testcase.iterations, function(innerIt) {
+        //             _.each(innerIt.steps, function(step) {
+        //                 if (step.screenshot) {
+        //                     stepsWithScreenshot.push(step);
+        //                 }
+        //             });
+        //         });
+        //     });
+        // });
     });
     const screenshotFilePrefix = 'screenshot-';
     const screenshotFileSuffix = '.png';
