@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+const fs = require("fs"); 
+const path = require("path"); 
+const archiver = require('archiver');
 const fakeServer = require('./fakeServer');
 const moment = require('moment');
 const axios = require('axios');
@@ -33,7 +36,7 @@ const statuses = {
 const params = {};
 const FAKE = 'fake';
 const FAKE_HOST = 'http://localhost:5000';
-const HOST = 'http://eqa.cloudbeat.io';
+let HOST = 'http://eqa.cloudbeat.io';
 const POOLING_INTERVAL = 1000;
 let spinner;
 let intervalHandler;
@@ -67,12 +70,81 @@ function saveTestRunResults(result) {
         method: 'saveTestRunResults',
         targetFolder: 'results'
     };
+
+    let folder;
+    
+    if(argv && argv.folder){
+        folder = argv.folder;
+    }
+
+    if(folder){
+        if (fs.existsSync(folder)) {
+            reporterOpt.targetFolder = folder;
+        } else {
+            console.error("Folder `"+folder+"` did not exist ");
+            process.exit(1);
+        }
+    }
+
     // serialize test results to XML and save to file
     try {
         var reporter = new ReporterClass(result, reporterOpt);
         var resultFilePath = reporter.generate();
-        console.log('Results saved to: ' + resultFilePath);
-        process.exit(0);
+        console.log('Results XLM saved to: ' + resultFilePath);
+
+        
+        // save XML to ZIP
+        if(folder && resultFilePath){
+            
+            // last is file name
+            // before last is folder created for file
+            // all before is targetFolder path from console
+            const resultFilePathSplit = resultFilePath.split(path.sep);
+            const resultFileName = resultFilePathSplit[resultFilePathSplit.length-1];
+
+            try {
+                // create a file to stream archive data to.
+                const pathToArchive = resultFilePath + '.zip';
+                const output = fs.createWriteStream(pathToArchive);
+                const archive = archiver('zip', {
+                    zlib: { level: 9 } // Sets the compression level.
+                });
+                
+                output.on('close', function() {
+                    console.log('Results ZIP saved to:', pathToArchive);
+                    process.exit(0);
+                });
+                
+                archive.on('warning', function(err) {
+                    if (err.code === 'ENOENT') {
+                        console.warn(err);
+                        // log warning
+                    } else {
+                        // throw error
+                        throw err;
+                    }
+                });
+                
+                archive.on('error', function(err) {
+                    throw err;
+                });
+                
+                // pipe archive data to the file
+                archive.pipe(output);
+                
+                // append a file from stream
+                archive.append(fs.createReadStream(resultFilePath), { name: resultFileName });
+                
+                // finalize the archive (ie we are done appending files but streams have to finish yet)
+                archive.finalize();
+
+            } catch (err) {
+                console.error("err" + err);
+                process.exit(1);
+            }
+        } else {
+            process.exit(0);
+        }
     } catch (err) {
         console.error("Can't save results to file: " + err.message);
         process.exit(1);
@@ -233,6 +305,12 @@ function startRealTest(id){
 
                 if(runStatus instanceof Promise){
                     runStatus.then((result)=>{
+                        if(typeof spinner !== 'undefined'){
+                            spinner.fail(result.error);
+                        } else {
+                            console.error(result.error);
+                        }
+
                         if(result && result.data && result.data.data && result.data.data && result.data.data.data.status){
                             const status = result.data.data.data.status;
                             
@@ -303,6 +381,15 @@ function startTest(id){
                     const runStatus = getRunStatus(response.data.data.runId, false);
                     if(runStatus instanceof Promise){
                         runStatus.then((result)=>{
+                            if(result && result.error){
+                                if(typeof spinner !== 'undefined'){
+                                    spinner.fail(result.error);
+                                } else {
+                                    console.error(result.error);
+                                }
+                                process.exit(1);
+                            }
+
                             if(result && result.data && result.data.data && result.data.data && result.data.data.data.status){
                                 const status = result.data.data.data.status;
                                 if(status === 'Finished'){
@@ -396,6 +483,11 @@ if(argv){
         }
     }
 
+    
+    if(argv.host){
+        HOST = argv.host;
+    }
+
     if(argv.method){
         if(argv.method === "start_test"){
             if(argv.id){
@@ -404,15 +496,21 @@ if(argv){
                 console.error('start_test method required id parameter');
                 process.exit(1);
             }
-        }
-        if(argv.method === "get_run_status"){
+        } else if(argv.method === "get_run_status"){
             if(argv.id){
                 let loaderString = 'Trying to get run status with id: '+ argv.id;
                 spinner = ora(loaderString).start();
 
                 const runStatus = getRunStatus(argv.id);
+
                 if(runStatus instanceof Promise){
                     runStatus.then((result)=>{
+                        if(typeof spinner !== 'undefined'){
+                            spinner.fail(result.error);
+                        } else {
+                            console.error(result.error);
+                        }
+
                         if(result && result.data && result.data.data){
                             spinner.succeed('Run status is : '+ result.data.data.data.status);
                             saveTestRunResults(result.data.data);
@@ -423,7 +521,13 @@ if(argv){
                 console.error('get_run_status method required id parameter');
                 process.exit(1);
             }
+        } else {
+            console.error('method name is not correct');
+            process.exit(1);
         }
+    } else {
+        console.error('method parameter is required');
+        process.exit(1);
     }
 } else {
     console.log('No args, please read docs');

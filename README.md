@@ -20,3 +20,9 @@ test sample : ```node src/cli.js --method=start_test --id=[id] --accountKey=[acc
 
 #### Get test status:
 Just run ```node src/cli.js fake --method=get_run_status --id=[id] --accountKey=[accountKey] --apiKey=[apiKey]```
+
+If you want to save results to some folder and pack it to zip add --folder parameter.
+For example ```--folder=C:\testResults```
+
+If you want to set your host - use --host parameter.
+For example ```--host=google.com```
