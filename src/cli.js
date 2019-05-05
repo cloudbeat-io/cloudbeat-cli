@@ -201,11 +201,7 @@ function reportResult(result) {
                 process.exit(1);
             }
         } else {
-            if(result.isSuccess){
-                process.exit(0);
-            } else {
-                process.exit(1);
-            }
+            process.exit(0);
         }
     } catch (err) {
         console.error("Can't save results to file: " + err.message);
