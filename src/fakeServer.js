@@ -1,4 +1,6 @@
-const http = require('http')
+const http = require('http');
+const formidable = require('formidable');
+const util = require('util');
 const port = 5000;
 const delay = 200;
 
@@ -18,6 +20,27 @@ const getCounter = () => {
 const requestHandler = (request, response) => {
 
     const urlSplit = request.url.split('/');
+
+    if(urlSplit[1] === 'zip'){
+      const form = new formidable.IncomingForm();
+      form.parse(request, function(err, fields, files) {
+        if (err) {
+          // Check for and handle any errors here.
+          console.error(err.message);
+          return;
+        }        
+         // Like real server
+         setTimeout(function(){ 
+            response.writeHead(200, {'content-type': 'text/plain'});
+            response.write('received upload:\n\n');
+    
+            // This last line responds to the form submission with a list of the parsed data and files.
+            response.end(util.inspect({fields: fields, files: files}));
+      }, delay);
+
+      });
+
+    }
 
     if(urlSplit[1] === 'suites'){
         if(urlSplit.length === 6){

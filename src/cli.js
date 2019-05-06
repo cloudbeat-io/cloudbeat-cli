@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require("fs"); 
+const request = require("request"); 
 const path = require("path"); 
 const archiver = require('archiver');
 const fakeServer = require('./fakeServer');
@@ -424,6 +425,122 @@ function getRunStatus(id){
     }
 }
 
+function getSaveFolderPath(folder){
+    if(folder && typeof folder === 'string'){
+        if(folder.endsWith(path.sep)){
+            return folder;
+        } else {
+            return folder+path.sep;
+        }
+    }
+    return false;
+}
+
+function sendZipToServer(zip){
+    if(!zip){
+        console.error('sendZipToServer method requires zip parameter');
+        process.exit(1);
+    }
+
+    if (fs.existsSync(zip)) {
+        if(params && params.fake){
+            try{
+                const req = request.post('http://localhost:5000/zip', function (err, resp, body) {
+                    if (err) {
+                        console.log('Error!');
+                        console.log('err', err);
+                    } else {
+                        console.log('Response from server: ' + body);
+                        process.exit(0);
+
+                    }
+                });
+                const form = req.form();
+                form.append('data', JSON.stringify(params));
+                form.append('file', fs.createReadStream(zip));
+            } catch(e){
+                console.error('e', e);
+                process.exit(1);
+            }
+        } else {
+            console.error('No real api and-point');
+            process.exit(1);
+        }
+    } else {
+        console.error("Archive `"+zip+"` did not exist ");
+        process.exit(1);
+    }
+}
+
+function packAndSend(folder){
+    if(!folder){
+        console.error('packAndSend method requires folder parameter');
+        process.exit(1);
+    }
+
+    if (fs.existsSync(folder)) {
+        // Archive folder
+        try {
+            const saveFolderPath = getSaveFolderPath(folder);
+
+            if(!saveFolderPath){
+                console.error('folder path is incorect: ', folder);
+                console.error('\n');
+                console.error('parsed folder path: ', saveFolderPath);
+                process.exit(1);
+            }
+
+            const timestamp = + new Date();
+            // create a file to stream archive data to.
+            const archiveName = timestamp+'.zip';
+            const pathToArchive = saveFolderPath+archiveName;
+            const output = fs.createWriteStream(pathToArchive);
+            const archive = archiver('zip', {
+                zlib: { level: 9 } // Sets the compression level.
+            });
+            
+            output.on('close', function() {
+                console.log('Results ZIP saved to:', pathToArchive);
+                sendZipToServer(pathToArchive);
+            });
+            
+            archive.on('warning', function(err) {
+                if (err.code === 'ENOENT') {
+                    console.warn(err);
+                    // log warning
+                } else {
+                    // throw error
+                    throw err;
+                }
+            });
+            
+            archive.on('error', function(err) {
+                throw err;
+            });
+            
+            // pipe archive data to the file
+            archive.pipe(output);
+            
+            // append files from a sub-directory
+            const globStr = saveFolderPath+'!('+archiveName+')';
+            archive.glob(globStr);
+
+            // finalize the archive (ie we are done appending files but streams have to finish yet)
+            archive.finalize();
+
+        } catch (err) {
+            console.error("err" + err);
+            process.exit(1);
+        }
+
+    } else {
+        console.error("Folder `"+folder+"` did not exist ");
+        process.exit(1);
+    }
+
+
+}
+
 if(argv){
     if(argv._ && Array.isArray(argv._)){
         if(argv._.includes(FAKE)){
@@ -478,7 +595,14 @@ if(argv){
                     });
                 }
             } else {
-                console.error('get_run_status method required id parameter');
+                console.error('get_run_status method requires id parameter');
+                process.exit(1);
+            }
+        } else if(argv.method === "pack_and_send"){
+            if(argv.folder){
+                packAndSend(argv.folder);
+            } else {
+                console.error('get_run_status method requires folder parameter');
                 process.exit(1);
             }
         } else {
