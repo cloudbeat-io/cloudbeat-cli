@@ -15,6 +15,10 @@ Just run ```node src/cli.js fake --method=get_run_status --id=c0310c37190140b5a6
 
 ## Real server:
 
+#### Uploading ZIP archives to CloudBeat:
+
+sample : ```node src/cli.js --method=pack_and_send --id=[id] --accountKey=[accountKey] --apiKey=[apiKey] --folder=C:\testResults --host=google.com```
+
 #### Run test:
 test sample : ```node src/cli.js --method=start_test --id=[id] --accountKey=[accountKey] --apiKey=[apiKey]```
 

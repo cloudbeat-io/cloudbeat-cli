@@ -436,11 +436,17 @@ function getSaveFolderPath(folder){
     return false;
 }
 
-function sendZipToServer(zip){
+function sendZipToServer(zip, id){
     if(!zip){
         console.error('sendZipToServer method requires zip parameter');
         process.exit(1);
     }
+
+    if(!id){
+        console.error('sendZipToServer method requires id parameter');
+        process.exit(1);
+    }
+
 
     if (fs.existsSync(zip)) {
         if(params && params.fake){
@@ -463,8 +469,26 @@ function sendZipToServer(zip){
                 process.exit(1);
             }
         } else {
-            console.error('No real api and-point');
-            process.exit(1);
+            try{
+                const req = request.post(HOST+'/projects/api/data/project/sync/artifacts/'+id+'?accountKey='+accountKey+'&apiKey='+apiKey, function (err, resp, body) {
+                    if (err) {
+                        console.log('Error!');
+                        console.log('err', err);
+                        process.exit(1);
+                    } else {
+                        console.log('Response(full): ', resp);
+                        console.log('Response from server: ' + body);
+                        process.exit(0);
+
+                    }
+                });
+                const form = req.form();
+                form.append('data', JSON.stringify(params));
+                form.append('file', fs.createReadStream(zip));
+            } catch(e){
+                console.error('e', e);
+                process.exit(1);
+            }
         }
     } else {
         console.error("Archive `"+zip+"` did not exist ");
@@ -472,11 +496,17 @@ function sendZipToServer(zip){
     }
 }
 
-function packAndSend(folder){
+function packAndSend(folder, id){
     if(!folder){
         console.error('packAndSend method requires folder parameter');
         process.exit(1);
     }
+
+    if(!id){
+        console.error('packAndSend method requires id parameter');
+        process.exit(1);
+    }
+
 
     if (fs.existsSync(folder)) {
         // Archive folder
@@ -501,7 +531,7 @@ function packAndSend(folder){
             
             output.on('close', function() {
                 console.log('Results ZIP saved to:', pathToArchive);
-                sendZipToServer(pathToArchive);
+                sendZipToServer(pathToArchive, id);
             });
             
             archive.on('warning', function(err) {
@@ -599,10 +629,10 @@ if(argv){
                 process.exit(1);
             }
         } else if(argv.method === "pack_and_send"){
-            if(argv.folder){
-                packAndSend(argv.folder);
+            if(argv.folder && argv.id){
+                packAndSend(argv.folder, argv.id);
             } else {
-                console.error('get_run_status method requires folder parameter');
+                console.error('get_run_status method requires folder and id parameter');
                 process.exit(1);
             }
         } else {
