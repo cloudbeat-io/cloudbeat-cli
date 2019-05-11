@@ -4,6 +4,7 @@ const fs = require("fs");
 const request = require("request"); 
 const path = require("path"); 
 const archiver = require('archiver');
+const tmp = require('tmp');
 const fakeServer = require('./fakeServer');
 const moment = require('moment');
 const axios = require('axios');
@@ -520,18 +521,16 @@ function packAndSend(folder, id){
                 process.exit(1);
             }
 
-            const timestamp = + new Date();
+            const archiveName = tmp.tmpNameSync() + '.zip';
             // create a file to stream archive data to.
-            const archiveName = timestamp+'.zip';
-            const pathToArchive = saveFolderPath+archiveName;
-            const output = fs.createWriteStream(pathToArchive);
+            const output = fs.createWriteStream(archiveName);
             const archive = archiver('zip', {
                 zlib: { level: 9 } // Sets the compression level.
             });
             
             output.on('close', function() {
-                console.log('Results ZIP saved to:', pathToArchive);
-                sendZipToServer(pathToArchive, id);
+                console.log('Results ZIP saved to:', archiveName);
+                sendZipToServer(archiveName, id);
             });
             
             archive.on('warning', function(err) {
@@ -552,23 +551,18 @@ function packAndSend(folder, id){
             archive.pipe(output);
             
             // append files from a sub-directory
-            const globStr = saveFolderPath+'!('+archiveName+')';
-            archive.glob(globStr);
+            archive.directory(saveFolderPath, false);
 
             // finalize the archive (ie we are done appending files but streams have to finish yet)
             archive.finalize();
-
         } catch (err) {
             console.error("err" + err);
             process.exit(1);
         }
-
     } else {
         console.error("Folder `"+folder+"` did not exist ");
         process.exit(1);
     }
-
-
 }
 
 if(argv){
