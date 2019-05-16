@@ -475,10 +475,16 @@ function sendZipToServer(zip, id){
                     if (err) {
                         console.log('Error!');
                         console.log('err', err);
+                        console.log('Zip was not uploaded!');
                         process.exit(1);
                     } else {
-                        console.log('Response(full): ', resp);
-                        console.log('Response from server: ' + body);
+                        if(resp.statusCode === 500){
+                            console.log('Error!');
+                            console.log('Response(full): ', resp);
+                            console.log('Zip was not uploaded!');
+                            process.exit(1);
+                        }
+                        console.log('Zip archive successfully uploaded to server.');
                         process.exit(0);
 
                     }
@@ -529,7 +535,7 @@ function packAndSend(folder, id){
             });
             
             output.on('close', function() {
-                console.log('Results ZIP saved to:', archiveName);
+                console.log('Directory was compressed, zip archive location:', archiveName);
                 sendZipToServer(archiveName, id);
             });
             
