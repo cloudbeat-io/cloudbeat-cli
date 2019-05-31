@@ -45,6 +45,7 @@ let textCache;
 let intervalHandler;
 let accountKey;
 let apiKey;
+let failOnErrors = true;
 
 function nextText(text){
     if(textCache === text){
@@ -169,6 +170,9 @@ function reportResult(result) {
                 output.on('close', function() {
                     console.log('Results ZIP saved to:', pathToArchive);
                     if(result.isSuccess){
+
+                        // need to add some code here, defense of failOnErrors variable
+
                         process.exit(0);
                     } else {
                         process.exit(1);
@@ -587,7 +591,18 @@ if(argv){
         }
     }
 
-    
+    if(typeof argv['fail-on-errors'] === 'string'){
+        if(['true', 'false'].includes(argv['fail-on-errors'])){
+            if(argv['fail-on-errors'] === 'false'){
+                failOnErrors = false;
+            }
+        } else {
+            console.error('fail-on-errors param can by only "true" or "false" ');
+            process.exit(1);
+        }
+    }
+    // fail-on-errors
+
     if(argv.host){
         HOST = argv.host;
     }
