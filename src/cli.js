@@ -111,6 +111,33 @@ function saveTestRunResults(result) {
     }
 }
 
+function finishCLI(result) {
+    var code = 1;
+
+    if(result){
+        if(result.isSuccess){    
+            code = 0;
+        } else {
+            code = 1;
+        }
+
+        if(failOnErrors){
+            // do nothing, all ok
+        } else {
+            if(code === 0){
+                code = 1;
+            } else if(code === 1){
+                code = 0;
+            }
+        }
+    }
+
+    console.log('exit code :', code);
+
+    process.exit(code);
+}
+
+
 function reportResult(result) {
     
     // try to dynamically load reporter class based on reporter format name received from the user
@@ -149,7 +176,6 @@ function reportResult(result) {
         var resultFilePath = reporter.generate();
         console.log('Results XLM saved to: ' + resultFilePath);
         
-        
         // save XML to ZIP
         if(folder && resultFilePath){
             
@@ -169,14 +195,7 @@ function reportResult(result) {
                 
                 output.on('close', function() {
                     console.log('Results ZIP saved to:', pathToArchive);
-                    if(result.isSuccess){
-
-                        // need to add some code here, defense of failOnErrors variable
-
-                        process.exit(0);
-                    } else {
-                        process.exit(1);
-                    }
+                    finishCLI(result);
                 });
                 
                 archive.on('warning', function(err) {
@@ -207,7 +226,7 @@ function reportResult(result) {
                 process.exit(1);
             }
         } else {
-            process.exit(0);
+            finishCLI(result);
         }
     } catch (err) {
         console.error("Can't save results to file: " + err.message);
