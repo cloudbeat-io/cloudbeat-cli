@@ -30,3 +30,6 @@ For example ```--folder=C:\testResults```
 
 If you want to set your host - use --host parameter.
 For example ```--host=google.com```
+
+If you want to set controlling exit code - use --fail-on-errors parameter (true or false). Default is true.
+For example ```--fail-on-errors=true```
