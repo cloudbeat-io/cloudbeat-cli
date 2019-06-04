@@ -1,6 +1,6 @@
 {
   "name": "cb-ci-api-cli",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "CloudBeat API CLI wrapper based on Node JS",
   "main": "build/cli.js",
   "scripts": {
