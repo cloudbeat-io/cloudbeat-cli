@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require("fs"); 
+const https = require('https');
 const request = require("request"); 
 const path = require("path"); 
 const archiver = require('archiver');
@@ -47,6 +48,14 @@ let accountKey;
 let apiKey;
 let failOnErrors = true;
 
+const Agent  = new https.Agent({
+    rejectUnauthorized: false
+})
+
+const instance = axios.create();
+instance.defaults.httpsAgent = Agent
+  
+
 function nextText(text){
     if(textCache === text){
         // ignore
@@ -78,7 +87,7 @@ function checkDataForError(data){
 }
 
 function getRunResult(runId) {
-    return axios.get(HOST+'/results/api/results/run/'+runId, {
+    return instance.get(HOST+'/results/api/results/run/'+runId, {
         params: {
             accountKey: accountKey,
             apiKey: apiKey,
@@ -246,7 +255,7 @@ function handleRealPooling(suiteId, runId){
     if(params && params.fake && suiteId && runId){
         // not support now
     } else {
-        return axios.get(HOST+'/runs/api/run/'+runId+'/', {
+        return instance.get(HOST+'/runs/api/run/'+runId+'/', {
             params: {
                 accountKey: accountKey,
                 apiKey: apiKey
@@ -328,7 +337,7 @@ function startRealTest(id){
     spinner = ora().start();
     nextText(loaderString);
 
-    axios.post(HOST+'/suites/api/suite/'+id+'/run', {
+    instance.post(HOST+'/suites/api/suite/'+id+'/run', {
         accountKey: accountKey,
         apiKey: apiKey
     })
@@ -418,7 +427,7 @@ function startTest(id){
 
 function getRunStatus(id){
     if(params && params.fake){
-        return axios.get(FAKE_HOST+'/runs/data/run/'+id+'/run', {})
+        return instance.get(FAKE_HOST+'/runs/data/run/'+id+'/run', {})
         .then(function (response) {
             return { data: response, error: null };
         })
@@ -429,7 +438,7 @@ function getRunStatus(id){
             return result;
         });
     } else {
-        return axios.get(HOST+'/runs/api/run/'+id, {
+        return instance.get(HOST+'/runs/api/run/'+id, {
             params: {
                 accountKey: accountKey,
                 apiKey: apiKey
