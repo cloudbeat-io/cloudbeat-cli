@@ -1,8 +1,7 @@
 # CloudBeat API CLI
 
-## Installing:
+## Installation:
 ```npm install -g cloudbeat-cli```
-
 
 ## Usage
 
@@ -16,13 +15,11 @@
 #### Get test status:
 Just run ```cloudbeat-cli --method=get_run_status --id=[id] --accountKey=[accountKey] --apiKey=[apiKey] --host=https://app.cloudbeat.io```
 
+#### Additional parameters
 If you want to save results to a folder and pack it to zip add --folder parameter.
 For example ```--folder=C:\testResults```
 
-If you want to set your host - use --host parameter.
-For example ```--host=google.com```
-
-If you want to set controlling exit code - use --fail-on-errors parameter (true or false). Default is true.
+Exit code can be controlled with `--fail-on-errors` (true or false). Default is true.
 For example ```--fail-on-errors=true```
 
 
