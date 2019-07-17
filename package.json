@@ -1,12 +1,13 @@
 {
-  "name": "cb-ci-api-cli",
-  "version": "0.2.0",
+  "name": "cloudbeat-cli",
+  "version": "0.2.2",
   "description": "CloudBeat API CLI wrapper based on Node JS",
   "main": "build/cli.js",
   "scripts": {
     "build": "babel src -d build",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/cli.js"
+    "start": "node src/cli.js",
+    "prepare": "npm run build"
   },
   "bin": {
     "cloudbeat-cli": "build/cli.js"
