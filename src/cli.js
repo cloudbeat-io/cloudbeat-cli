@@ -87,12 +87,18 @@ function checkDataForError(data){
 }
 
 function getRunResult(runId) {
+
+    const params = {
+        apiKey: apiKey,
+        noInstances: true
+    }
+
+    if(accountKey){
+        params.accountKey = accountKey;
+    }
+
     return instance.get(HOST+'/results/api/results/run/'+runId, {
-        params: {
-            accountKey: accountKey,
-            apiKey: apiKey,
-            noInstances: true
-        }
+        params: params
     })
     .then(function (response) {
         checkDataForError(response.data);
@@ -255,11 +261,17 @@ function handleRealPooling(suiteId, runId){
     if(params && params.fake && suiteId && runId){
         // not support now
     } else {
+        
+        const params = {
+            apiKey: apiKey
+        }
+
+        if(accountKey){
+            params.accountKey = accountKey;
+        }
+
         return instance.get(HOST+'/runs/api/run/'+runId+'/', {
-            params: {
-                accountKey: accountKey,
-                apiKey: apiKey
-            }
+            params: params
         })
         .then(function (response) {
             checkDataForError(response.data);
@@ -336,11 +348,16 @@ function startRealTest(id){
     let loaderString = 'Trying to run test with suite id: '+ id;
     spinner = ora().start();
     nextText(loaderString);
-
-    instance.post(HOST+'/suites/api/suite/'+id+'/run', {
-        accountKey: accountKey,
+    
+    const params = {
         apiKey: apiKey
-    })
+    }
+
+    if(accountKey){
+        params.accountKey = accountKey;
+    }
+
+    instance.post(HOST+'/suites/api/suite/'+id+'/run', params)
       .then(function (response) {
         checkDataForError(response.data);
         if(response.status === 200){
@@ -438,11 +455,16 @@ function getRunStatus(id){
             return result;
         });
     } else {
+        const params = {
+            apiKey: apiKey
+        }
+    
+        if(accountKey){
+            params.accountKey = accountKey;
+        }
+
         return instance.get(HOST+'/runs/api/run/'+id, {
-            params: {
-                accountKey: accountKey,
-                apiKey: apiKey
-            }
+            params: params
         })
         .then(function (response) {
             checkDataForError(response.data);
@@ -502,8 +524,21 @@ function sendZipToServer(zip, id){
                 process.exit(1);
             }
         } else {
+
+            let url = '/projects/api/data/project/sync/artifacts/';
+
+            if(id){
+                url+=id;
+            }
+
+            if(accountKey && apiKey){
+                url+='?accountKey='+accountKey+'&apiKey='+apiKey;
+            } else if(apiKey){
+                url+='?apiKey='+apiKey;
+            }
+
             try{
-                const req = request.post(HOST+'/projects/api/data/project/sync/artifacts/'+id+'?accountKey='+accountKey+'&apiKey='+apiKey, function (err, resp, body) {
+                const req = request.post(HOST+url, function (err, resp, body) {
                     if (err) {
                         console.log('Error!');
                         console.log('err', err);
@@ -609,11 +644,14 @@ if(argv){
             params.fake = true;
             console.log(`Fake mode`);
         } else {
-            if(argv.accountKey && argv.apiKey){
-                accountKey = argv.accountKey;
+            if(argv.apiKey){
                 apiKey = argv.apiKey;
+
+                if(argv.accountKey){
+                    accountKey = argv.accountKey;
+                }
             } else {
-                console.error('cli requires accountKey and apiKey parameters');
+                console.error('cli requires apiKey parameters');
                 process.exit(1);
             }
         }
