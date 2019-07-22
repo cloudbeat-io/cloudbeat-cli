@@ -1,3 +1,4 @@
+
 # CloudBeat API CLI
 
 ## Installation:
@@ -5,15 +6,18 @@
 
 ## Usage
 
-#### Upload ZIP archives to CloudBeat:
+#### Running a Suite:
+Following command will execute the specified Suite, wait for the tests to finish, and will produce XML report in JUnit format: 
+```cloudbeat-cli --method=start_test --id=[id] --apiKey=[apiKey] --host=https://app.cloudbeat.io```
 
-```cloudbeat-cli --method=pack_and_send --id=[id] --accountKey=[accountKey] --apiKey=[apiKey] --folder=C:\testResults --host=https://app.cloudbeat.io```
+#### Getting test status:
+`get_run_status` switch can be used for getting status of an already running test:
+```cloudbeat-cli --method=get_run_status --id=[id] --apiKey=[apiKey] --host=https://app.cloudbeat.io```
 
-#### Run Suite:
-```cloudbeat-cli --method=start_test --id=[id] --accountKey=[accountKey] --apiKey=[apiKey] --host=https://app.cloudbeat.io```
+#### CI/CD integration for Cucumber projects - Uploading ZIP archives to CloudBeat:
 
-#### Get test status:
-Just run ```cloudbeat-cli --method=get_run_status --id=[id] --accountKey=[accountKey] --apiKey=[apiKey] --host=https://app.cloudbeat.io```
+```cloudbeat-cli --method=pack_and_send --id=[id] --apiKey=[apiKey] --folder=C:\testResults --host=https://app.cloudbeat.io```
+
 
 #### Additional parameters
 If you want to save results to a folder and pack it to zip add --folder parameter.
@@ -23,13 +27,12 @@ Exit code can be controlled with `--fail-on-errors` (true or false). Default is 
 For example ```--fail-on-errors=true```
 
 
-## Development - fake server:
+## Development (using mockup server):
 
 #### Run test:
 * short(time) test sample : ```node src/cli.js fake --method=start_test --id=1```
 
 * long(time) test sample : ```node src/cli.js fake --method=start_test --id=2```
 
-#### Get test status:
-Just run ```node src/cli.js fake --method=get_run_status --id=c0310c37190140b5a61d7e2d0d3493bc```
-
+#### Getting test status:
+```node src/cli.js fake --method=get_run_status --id=c0310c37190140b5a61d7e2d0d3493bc```
