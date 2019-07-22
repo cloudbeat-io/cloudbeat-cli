@@ -16,8 +16,12 @@
     "type": "git",
     "url": "git+https://github.com/oxygenhq/cloudbeat-cli.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": {
+    "name": "CloudBeat Limited",
+    "email": "info@cloudbeat.io",
+    "url": "http://cloudbeat.io"
+  },
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/oxygenhq/cloudbeat-cli/issues"
   },
