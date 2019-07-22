@@ -1,7 +1,7 @@
 {
   "name": "cloudbeat-cli",
-  "version": "0.2.2",
-  "description": "CloudBeat API CLI wrapper based on Node JS",
+  "version": "0.3.0",
+  "description": "CloudBeat API CLI wrapper",
   "main": "build/cli.js",
   "scripts": {
     "build": "babel src -d build",
