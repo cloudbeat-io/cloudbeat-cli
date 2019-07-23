@@ -130,11 +130,7 @@ function finishCLI(result) {
     var code = 1;
 
     if(result){
-        if(result.isSuccess){    
-            code = 0;
-        } else {
-            code = 1;
-        }
+        code = result.result.isSuccess ? 0 : 1;
 
         if(failOnErrors){
             // do nothing, all ok
