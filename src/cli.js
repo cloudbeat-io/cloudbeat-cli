@@ -90,7 +90,7 @@ function getRunResult(runId) {
 
     const params = {
         apiKey: apiKey,
-        noInstances: true
+        noInstances: false
     }
 
     if(accountKey){

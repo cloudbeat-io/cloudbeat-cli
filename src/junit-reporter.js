@@ -22,6 +22,42 @@ function JUnitXmlReporter(results, options) {
     JUnitXmlReporter.super_.call(this, results, options);
 }
 
+const formatTime = (time) => {
+    try{
+        if(time && time.toFixed){
+            return time.toFixed(2);
+        } else {
+            return time;
+        }
+    } catch(e) {
+        console.warn('format time error', e);
+        return 'format time error';
+    }
+}
+
+const getCaseDuration = (stepList) => {
+    try{
+        let result = 0;
+
+        if(stepList && Array.isArray(stepList)){
+            stepList.map((item) => {
+                if(item && item.duration && typeof item.duration === 'number'){
+                    result += item.duration;
+                }
+            })
+        }
+
+        if(result > 0){
+            result = result/1000;
+        }
+
+        return result;
+    } catch(e) {
+        console.warn('get case duration error', e);
+        return 0;
+    }
+}
+
 JUnitXmlReporter.prototype.generate = function() {
     var resultFilePath = this.createFolderStructureAndFilePath('.xml');
     var resultFolderPath = path.dirname(resultFilePath);
@@ -63,30 +99,74 @@ JUnitXmlReporter.prototype.generate = function() {
 };
 function populateTestRunResult(obj, builder) {
 
+
+    let instances;
+    let iterationList;
     const data = obj.result;
 
-    // console.log('obj', obj);
-    // console.log('\n\n\n');
-    // console.log('data', data);
-    // console.log('\n\n\n');
-    // console.log('obj.cases', obj.cases);
+    if(obj && obj.instances && Array.isArray(obj.instances)){
+        instances = obj.instances;
+
+        if(Array.isArray(instances) && instances[0] && instances[0].iterationList && Array.isArray(instances[0].iterationList)){
+            iterationList = instances[0].iterationList;
+        }
+    }
+
 
     var suite = builder.testSuite()
-    .time(data.duration)
+    .time(formatTime(data.duration))
     .id(data.id)
     .name(data.testName);
 
     if(obj && obj.cases){
-        obj.cases.map(item => {            
+        obj.cases.map((item, index) => {       
+
+            let caseDuration = 0;
+            let caseFailedMessage = '';
+                        
+            if(
+                iterationList && 
+                Array.isArray(iterationList) && 
+                iterationList[index] && 
+                iterationList[index].stepList
+            ) {
+                const stepList = iterationList[index].stepList || [];
+                
+                caseDuration = getCaseDuration(stepList);
+
+                if(iterationList[index].failure){
+                
+                    const failure = iterationList[index].failure || {};
+    
+                    if(failure){
+                        
+                        if(failure.type && typeof failure.type === 'string'){
+                            caseFailedMessage += failure.type+' - ';
+                        }
+
+                        if(failure.message && typeof failure.message === 'string'){
+                            caseFailedMessage += failure.message;
+                        }
+                        
+                        if(failure.details && typeof failure.details === 'string'){
+                            caseFailedMessage += failure.details;
+                        }
+                    }
+                }
+
+            }
+            
             if(item.isSuccess){
                 var testCase = suite.testCase()
+                .time(formatTime(caseDuration))
                 .id(item.testCaseId)
                 .name(item.caseName)
             } else {
                 var testCase = suite.testCase()
+                .time(formatTime(caseDuration))
                 .id(item.testCaseId)
                 .name(item.caseName)
-                .failure();
+                .failure(caseFailedMessage);
             }  
         })
     }
