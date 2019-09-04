@@ -14,14 +14,12 @@ Following command will execute the specified Suite, wait for the tests to finish
 `get_run_status` switch can be used for getting status of an already running test:
 ```cloudbeat-cli --method=get_run_status --id=[id] --apiKey=[apiKey] --host=https://app.cloudbeat.io```
 
-#### CI/CD integration for Cucumber projects - Uploading ZIP archives to CloudBeat:
+#### CI/CD integration - Uploading ZIP archives to CloudBeat:
 
 ```cloudbeat-cli --method=pack_and_send --id=[id] --apiKey=[apiKey] --folder=C:\testResults --host=https://app.cloudbeat.io```
 
 
 #### Additional parameters
-If you want to save results to a folder and pack it to zip add --folder parameter.
-For example ```--folder=C:\testResults```
 
 Exit code can be controlled with `--fail-on-errors` (true or false). Default is true.
 For example ```--fail-on-errors=true```
