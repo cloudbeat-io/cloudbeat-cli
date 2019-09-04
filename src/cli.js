@@ -180,74 +180,13 @@ function reportResult(result) {
 
     // serialize test results to XML and save to file
     try {
-
         var reporter = new ReporterClass(result, reporterOpt);
         var resultFilePath = reporter.generate();
         console.log('Results XLM saved to: ' + resultFilePath);
-        
-        // save XML to ZIP
-        if(folder && resultFilePath){
-            
-            // last is file name
-            // before last is folder created for file
-            // all before is targetFolder path from console
-            const resultFilePathSplit = resultFilePath.split(path.sep);
-            const resultFileName = resultFilePathSplit[resultFilePathSplit.length-1];
-
-            try {
-                // create a file to stream archive data to.
-                const pathToArchive = resultFilePath + '.zip';
-                const output = fs.createWriteStream(pathToArchive);
-                const archive = archiver('zip', {
-                    zlib: { level: 9 } // Sets the compression level.
-                });
-                
-                output.on('close', function() {
-                    console.log('Results ZIP saved to:', pathToArchive);
-                    finishCLI(result);
-                });
-                
-                archive.on('warning', function(err) {
-                    if (err.code === 'ENOENT') {
-                        console.warn(err);
-                        // log warning
-                    } else {
-                        // throw error
-                        throw err;
-                    }
-                });
-                
-                archive.on('error', function(err) {
-                    throw err;
-                });
-                
-                // pipe archive data to the file
-                archive.pipe(output);
-                
-                // append a file from stream
-                archive.append(fs.createReadStream(resultFilePath), { name: resultFileName });
-                
-                // finalize the archive (ie we are done appending files but streams have to finish yet)
-                archive.finalize();
-
-            } catch (err) {
-                console.error("err" + err);
-                process.exit(1);
-            }
-        } else {
-            finishCLI(result);
-        }
+        finishCLI(result);
     } catch (err) {
         console.error("Can't save results to file: " + err.message);
         process.exit(1);
-    }
-}
-
-function handlePooling(suiteId, runId){
-    if(params && params.fake && suiteId && runId){
-        // not support now
-    } else {
-        // todo need info about url
     }
 }
 
@@ -403,9 +342,9 @@ function startRealTest(id){
                         } else {
                             if(typeof spinner !== 'undefined'){
                                 spinner.fail(result.data);
-                            }             
+                            }
                             console.warn('bad result', result);
-                            process.exit(1);                               
+                            process.exit(1);
                         }
                     })
                 } else {
@@ -496,18 +435,15 @@ function sendZipToServer(zip, id){
         process.exit(1);
     }
 
-
     if (fs.existsSync(zip)) {
         if(params && params.fake){
             try{
                 const req = request.post('http://localhost:5000/zip', function (err, resp, body) {
                     if (err) {
-                        console.log('Error!');
-                        console.log('err', err);
+                        console.log('Error posting to http://localhost:5000/zip', err);
                     } else {
                         console.log('Response from server: ' + body);
                         process.exit(0);
-
                     }
                 });
                 const form = req.form();
@@ -518,7 +454,6 @@ function sendZipToServer(zip, id){
                 process.exit(1);
             }
         } else {
-
             let url = '/projects/api/data/project/sync/artifacts/';
 
             if(id){
@@ -559,7 +494,7 @@ function sendZipToServer(zip, id){
             }
         }
     } else {
-        console.error("Archive `"+zip+"` did not exist ");
+        console.error("Archive `"+zip+"` does not exist");
         process.exit(1);
     }
 }
@@ -627,7 +562,7 @@ function packAndSend(folder, id){
             process.exit(1);
         }
     } else {
-        console.error("Folder `"+folder+"` did not exist ");
+        console.error("Folder `"+folder+"` does not exist ");
         process.exit(1);
     }
 }
