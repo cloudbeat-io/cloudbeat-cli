@@ -22,7 +22,6 @@ Pending = 0,
 Initializing = 1,
 Running = 2,
 Finished = 3,
-Canceling = 4,
 Canceled = 5
 
 */
@@ -31,7 +30,6 @@ const statuses = {
     Initializing: 'Initializing',
     Running: 'Running',
     Finished: 'Finished',
-    Canceling: 'Canceling',
     Canceled: 'Canceled'
 }
 
@@ -274,7 +272,7 @@ function handleRealPooling(suiteId, runId){
 
             const status = response.data.data.status;
 
-            if([statuses.Pending, statuses.Initializing, statuses.Running, statuses.Canceling].includes(status)){
+            if([statuses.Pending, statuses.Initializing, statuses.Running].includes(status)){
                 
                 let spinnerNewText;
 
@@ -377,7 +375,7 @@ function startRealTest(id){
                         if(result && result.data && result.data.data && result.data.data && result.data.data.data.status){
                             const status = result.data.data.data.status;
                             
-                            if([statuses.Pending, statuses.Initializing, statuses.Running, statuses.Canceling].includes(status)){
+                            if([statuses.Pending, statuses.Initializing, statuses.Running].includes(status)){
                                 
                                 if(typeof spinner !== 'undefined'){
                                     nextText(status);
