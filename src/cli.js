@@ -276,9 +276,9 @@ function startPoolingRunStatus(suiteId, runId){
     }
 }
 
-function startRealTest(id){
+function startRealTest(id, path){
         
-    let loaderString = 'Trying to run test with suite id: '+ id;
+    let loaderString = 'Trying to run test with '+ path +' id: '+ id;
     spinner = ora().start();
     nextText(loaderString);
     
@@ -290,7 +290,7 @@ function startRealTest(id){
         params.accountKey = accountKey;
     }
 
-    instance.post(HOST+'/suites/api/suite/'+id+'/run', params)
+    instance.post(HOST+'/'+path+'s/api/'+path+'/'+id+'/run', params)
       .then(function (response) {
         checkDataForError(response.data);
         if(response.status === 200){
@@ -367,11 +367,11 @@ function startRealTest(id){
       });
 }
 
-function startTest(id){
+function startTest(id, path){
     if(params && params.fake){
         // not support now
     } else {
-        startRealTest(id);
+        startRealTest(id, path);
     }
 }
 
@@ -604,10 +604,12 @@ if(argv){
 
     if(argv.method){
         if(argv.method === "start_test"){
-            if(argv.id){
-                startTest(argv.id);
+            if(argv.suiteId){
+                startTest(argv.suiteId, 'suite');
+            } else if(argv.caseId){
+                startTest(argv.caseId, 'case');
             } else {
-                console.error('start_test method required id parameter');
+                console.error('start_test method required suiteId or caseId parameter');
                 process.exit(1);
             }
         } else if(argv.method === "get_run_status"){
@@ -635,7 +637,7 @@ if(argv){
                     });
                 }
             } else {
-                console.error('get_run_status method requires id parameter');
+                console.error('get_run_status method requires suiteId or caseId parameter');
                 process.exit(1);
             }
         } else if(argv.method === "pack_and_send"){
