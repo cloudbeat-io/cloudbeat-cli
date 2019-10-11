@@ -42,7 +42,6 @@ const POOLING_INTERVAL = 1000;
 let spinner;
 let textCache;
 let intervalHandler;
-let accountKey;
 let apiKey;
 let failOnErrors = true;
 
@@ -91,10 +90,6 @@ function getRunResult(runId) {
         noInstances: false
     }
 
-    if(accountKey){
-        params.accountKey = accountKey;
-    }
-
     return instance.get(HOST+'/results/api/results/run/'+runId, {
         params: params
     })
@@ -111,16 +106,29 @@ function getRunResult(runId) {
 }
 
 function saveTestRunResults(result) {    
+
     if(result && result.data && result.data.runId){
         const runResult = getRunResult(result.data.runId)
         
         if(runResult instanceof Promise){
             runResult.then((result)=>{
+                
+                if(result && result.error){
+                    if(typeof spinner !== 'undefined'){
+                        spinner.fail(result.error+', check you input data');
+                    } else {
+                        console.error(result.error);
+                    }
+                }
+
                 if(result && result.data && result.data.data && result.data.data.data){
                     reportResult(result.data.data.data);
                 }
             });
         }
+    } else {
+        console.log('saveTestRunResults bad params');
+        process.exit(1);
     }
 }
 
@@ -143,7 +151,6 @@ function finishCLI(result) {
 
     console.log('exit code :', code);
 
-    process.exit(code);
 }
 
 
@@ -199,10 +206,6 @@ function handleRealPooling(suiteId, runId){
             apiKey: apiKey
         }
 
-        if(accountKey){
-            params.accountKey = accountKey;
-        }
-
         return instance.get(HOST+'/runs/api/run/'+runId+'/', {
             params: params
         })
@@ -221,8 +224,6 @@ function handleRealPooling(suiteId, runId){
                     } else {
                         spinnerNewText = status;
                     }
-                    // console.log('\n response.data.data', response.data.data);
-                    // console.log('\n');
                 } else {   
                     spinnerNewText = status;
                 }
@@ -232,7 +233,7 @@ function handleRealPooling(suiteId, runId){
                     // spinner.text = spinnerNewText;
                 }
 
-                startPoolingRunStatus(id, response.data.data.runId);
+                startPoolingRunStatus(id, response.data.data.id);
             }
             
        
@@ -254,12 +255,8 @@ function handleRealPooling(suiteId, runId){
             }
         })
         .catch(function (error) {
-
             if(error && error.code && error.code === 'HPE_INVALID_CONSTANT'){
-                // console.log('\n error', error);
                 process.exit(1);
-                //ignore
-            } else {
             }
         })
         .then(function (result) {
@@ -282,30 +279,23 @@ function startRealTest(id, path){
     spinner = ora().start();
     nextText(loaderString);
     
-    const params = {
-        apiKey: apiKey
-    }
-
-    if(accountKey){
-        params.accountKey = accountKey;
-    }
-
-    instance.post(HOST+'/'+path+'s/api/'+path+'/'+id+'/run', params)
+    instance.post(HOST+'/'+path+'s/api/'+path+'/'+id+'/run?apiKey='+apiKey)
       .then(function (response) {
+
         checkDataForError(response.data);
         if(response.status === 200){
-            if(response.data && response.data.data && response.data.data.runId){
+            if(response.data && response.data.data && response.data.data.id){
 
-                loaderString = 'Started test with run id: '+ response.data.data.runId;
+                loaderString = 'Started test with run id: '+ response.data.data.id;
                 nextText(loaderString);
-                // spinner.text = loaderString;
-                const runStatus = getRunStatus(response.data.data.runId, false);
+                const runStatus = getRunStatus(response.data.data.id, false);
              
                 if(runStatus instanceof Promise){
                     runStatus.then((result)=>{
+
                         if(result && result.error){
                             if(typeof spinner !== 'undefined'){
-                                spinner.fail(result.error);
+                                spinner.fail(result.error+', check you input data');
                             } else {
                                 console.error(result.error);
                             }
@@ -321,7 +311,7 @@ function startRealTest(id, path){
                                     // spinner.text = status;
                                 }
 
-                                startPoolingRunStatus(id, response.data.data.runId);
+                                startPoolingRunStatus(id, response.data.data.id);
                             }
                             
 
@@ -352,7 +342,12 @@ function startRealTest(id, path){
                   process.exit(1);
                 }
             } else {
-                console.warn('bad response.data', response.data);
+                if(response.data && response.data.data && response.data.data.id === null ){
+                    console.warn('Test not startend, check you input data');
+                } else {
+                    console.warn('bad response.data', response.data);
+                }
+
                 process.exit(1);
             }
         } else {
@@ -363,6 +358,22 @@ function startRealTest(id, path){
       .catch(function (error) {
         console.error('\n error', error.message);
         console.error('\n full error', error);
+        
+        
+        if(error.response.status === 422){
+            if(error.response.data){
+                if(error.response.data.errorMessage){
+                    console.log(error.response.data.errorMessage);
+                }
+                if(error.response.data.errors && Array.isArray(error.response.data.errors) && error.response.data.errors.length > 0){
+
+                    error.response.data.errors.map((message) => {
+                        console.log(message);
+                    })
+                }
+            }
+        }
+
         process.exit(1);
       });
 }
@@ -377,28 +388,8 @@ function startTest(id, path){
 
 function getRunStatus(id){
     if(params && params.fake){
-        return instance.get(FAKE_HOST+'/runs/data/run/'+id+'/run', {})
-        .then(function (response) {
-            return { data: response, error: null };
-        })
-        .catch(function (error) {
-            return { data: null, error: error.message };
-        })
-        .then(function (result) {
-            return result;
-        });
     } else {
-        const params = {
-            apiKey: apiKey
-        }
-    
-        if(accountKey){
-            params.accountKey = accountKey;
-        }
-
-        return instance.get(HOST+'/runs/api/run/'+id, {
-            params: params
-        })
+        return instance.get(HOST+'/runs/api/run/'+id+'?apiKey='+apiKey)
         .then(function (response) {
             checkDataForError(response.data);
             return { data: response, error: null };
@@ -454,15 +445,13 @@ function sendZipToServer(zip, id){
                 process.exit(1);
             }
         } else {
-            let url = '/projects/api/data/project/sync/artifacts/';
+            let url = '/projects/api/project/sync/artifacts/';
 
             if(id){
                 url+=id;
             }
 
-            if(accountKey && apiKey){
-                url+='?accountKey='+accountKey+'&apiKey='+apiKey;
-            } else if(apiKey){
+            if(apiKey){
                 url+='?apiKey='+apiKey;
             }
 
@@ -480,6 +469,33 @@ function sendZipToServer(zip, id){
                             console.log('Zip was not uploaded!');
                             process.exit(1);
                         }
+                        
+                        if(resp.statusCode === 422){
+                            console.log('Error!');
+                            console.log('Response(full): ', resp);
+                            console.log('Zip was not uploaded!');
+
+                            try{
+                                const resultJson = JSON.parse(resp.body);
+
+                                if(resultJson){
+                                    if(resultJson.errorMessage){
+                                        console.log(resultJson.errorMessage);
+                                    }
+                                    if(resultJson.errors && Array.isArray(resultJson.errors) && resultJson.errors.length > 0){
+
+                                        resultJson.errors.map((message) => {
+                                            console.log(message);
+                                        })
+                                    }
+                                }
+                            } catch(e){
+                                console.warn('e',e);
+                            }
+
+                            process.exit(1);
+                        }
+
                         console.log('Zip archive successfully uploaded to server.');
                         process.exit(0);
 
@@ -575,10 +591,6 @@ if(argv){
         } else {
             if(argv.apiKey){
                 apiKey = argv.apiKey;
-
-                if(argv.accountKey){
-                    accountKey = argv.accountKey;
-                }
             } else {
                 console.error('cli requires apiKey parameters');
                 process.exit(1);
@@ -624,7 +636,7 @@ if(argv){
                         
                         if(result && result.error){
                             if(typeof spinner !== 'undefined'){
-                                spinner.fail(result.error);
+                                spinner.fail(result.error+', check you input data');
                             } else {
                                 console.error(result.error);
                             }
@@ -632,7 +644,12 @@ if(argv){
 
                         if(result && result.data && result.data.data){
                             spinner.succeed('Run status is : '+ result.data.data.data.status);
-                            saveTestRunResults(result.data.data);
+
+                            if([statuses.Pending, statuses.Initializing, statuses.Running].includes(result.data.data.data.status)){
+                                process.exit(0);
+                            } else {    
+                                saveTestRunResults(result.data.data);
+                            }
                         }
                     });
                 }
