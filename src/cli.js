@@ -463,16 +463,31 @@ function sendZipToServer(zip, id){
                         console.log('Zip was not uploaded!');
                         process.exit(1);
                     } else {
-                        if(resp.statusCode === 500){
+
+                        if(resp.statusCode === 200){
+                            console.log('Zip archive successfully uploaded to server.');
+                            process.exit(0);
+                        } else if(resp.statusCode === 500){
                             console.log('Error!');
-                            console.log('Response(full): ', resp);
+
+                            if(typeof resp.body === 'string'){
+                                const searchString = 'd2p1:string';
+                                const includes = resp.body.includes(searchString);
+
+                                if(includes){
+                                    const splitResult = resp.body.split(searchString);
+
+                                    if(splitResult && Array.isArray(splitResult) && splitResult.length === 3){
+                                        let resultString = splitResult[1].slice(1,-2);
+                                        console.log('Error details: ', resultString);
+                                    }
+                                }
+                            }
+                            
                             console.log('Zip was not uploaded!');
                             process.exit(1);
-                        }
-                        
-                        if(resp.statusCode === 422){
+                        } else if(resp.statusCode === 422){
                             console.log('Error!');
-                            console.log('Response(full): ', resp);
                             console.log('Zip was not uploaded!');
 
                             try{
@@ -494,11 +509,17 @@ function sendZipToServer(zip, id){
                             }
 
                             process.exit(1);
+                        } else if(resp.statusCode === 401){
+                            console.log('Error!');
+                            console.log('Check your api key');
+                            console.log('Zip was not uploaded!');
+                            process.exit(1);
+                        } else {
+                            console.log('Error!');
+                            console.log('StatusCode : ', resp.statusCode);
+                            console.log('Zip was not uploaded!');
+                            process.exit(1);
                         }
-
-                        console.log('Zip archive successfully uploaded to server.');
-                        process.exit(0);
-
                     }
                 });
                 const form = req.form();
