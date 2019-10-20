@@ -463,12 +463,11 @@ function sendZipToServer(zip, id){
                         console.log('Zip was not uploaded!');
                         process.exit(1);
                     } else {
-
                         if(resp.statusCode === 200){
-                            console.log('Zip archive successfully uploaded to server.');
+                            console.log('Zip archive successfully uploaded to the server.');
                             process.exit(0);
                         } else if(resp.statusCode === 500){
-                            console.log('Error!');
+                            console.error('Server side error has occurred:');
 
                             if(typeof resp.body === 'string'){
                                 const searchString = 'd2p1:string';
@@ -479,45 +478,41 @@ function sendZipToServer(zip, id){
 
                                     if(splitResult && Array.isArray(splitResult) && splitResult.length === 3){
                                         let resultString = splitResult[1].slice(1,-2);
-                                        console.log('Error details: ', resultString);
+                                        console.error('Error details: ', resultString);
                                     }
                                 }
                             }
-                            
-                            console.log('Zip was not uploaded!');
+                        
                             process.exit(1);
                         } else if(resp.statusCode === 422){
-                            console.log('Error!');
-                            console.log('Zip was not uploaded!');
+                            console.error('An error has occurred:');
 
                             try{
                                 const resultJson = JSON.parse(resp.body);
 
                                 if(resultJson){
                                     if(resultJson.errorMessage){
-                                        console.log(resultJson.errorMessage);
+                                        console.error(resultJson.errorMessage);
                                     }
                                     if(resultJson.errors && Array.isArray(resultJson.errors) && resultJson.errors.length > 0){
-
                                         resultJson.errors.map((message) => {
-                                            console.log(message);
+                                            console.error(message);
                                         })
                                     }
                                 }
-                            } catch(e){
-                                console.warn('e',e);
+                            } catch(e) {
+                                console.error('e', e);
                             }
 
                             process.exit(1);
                         } else if(resp.statusCode === 401){
-                            console.log('Error!');
-                            console.log('Check your api key');
-                            console.log('Zip was not uploaded!');
+                            console.error('Authentication Error: Invalid API Key.');
+                            process.exit(1);
+                        } else if(resp.statusCode === 404){
+                            console.error('The specified ID is invalid.');
                             process.exit(1);
                         } else {
-                            console.log('Error!');
-                            console.log('StatusCode : ', resp.statusCode);
-                            console.log('Zip was not uploaded!');
+                            console.error('An error has occurred. Response Code: ', resp.statusCode);
                             process.exit(1);
                         }
                     }
@@ -554,7 +549,7 @@ function packAndSend(folder, id){
             const saveFolderPath = getSaveFolderPath(folder);
 
             if(!saveFolderPath){
-                console.error('folder path is incorect: ', folder);
+                console.error('folder path is incorrect: ', folder);
                 console.error('\n');
                 console.error('parsed folder path: ', saveFolderPath);
                 process.exit(1);
@@ -625,7 +620,7 @@ if(argv){
                 failOnErrors = false;
             }
         } else {
-            console.error('fail-on-errors param can by only "true" or "false" ');
+            console.error('fail-on-errors arguments can by only "true" or "false" ');
             process.exit(1);
         }
     }
@@ -694,6 +689,6 @@ if(argv){
         process.exit(1);
     }
 } else {
-    console.log('No args, please read docs');
+    console.error('Missing arguments. Please read the docs.');
     process.exit(1);
 }
