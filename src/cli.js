@@ -38,6 +38,7 @@ const params = {};
 const FAKE = 'fake';
 const FAKE_HOST = 'http://localhost:5000';
 let HOST = 'http://eqa.cloudbeat.io';
+let DEBUG = false;
 const POOLING_INTERVAL = 1000;
 let spinner;
 let textCache;
@@ -355,23 +356,51 @@ function startRealTest(id, path){
             process.exit(1);
         }
       })
-      .catch(function (error) {
-        console.error('\n error', error.message);
-        console.error('\n full error', error);
-        
-        
-        if(error.response.status === 422){
-            if(error.response.data){
-                if(error.response.data.errorMessage){
-                    console.log(error.response.data.errorMessage);
+      .catch(function (error) { 
+        if(error && error.response && error.response.status){
+            if(error.response.status === 422){
+                if(error.response.data){
+                    if(error.response.data.errorMessage){
+                        console.log(error.response.data.errorMessage);
+                    }
+                    if(error.response.data.errors && Array.isArray(error.response.data.errors) && error.response.data.errors.length > 0){
+    
+                        error.response.data.errors.map((message) => {
+                            console.log(message);
+                        })
+                    }
+                    spinner.fail(`Error: ${error.message}`);
                 }
-                if(error.response.data.errors && Array.isArray(error.response.data.errors) && error.response.data.errors.length > 0){
-
-                    error.response.data.errors.map((message) => {
-                        console.log(message);
-                    })
+            } else if(error.response.status === 404){
+                let name = '';
+                if(path === 'case'){
+                    name = 'Case';
+                } else if(path === 'suite'){
+                    name = 'Suite';
                 }
+    
+                if(name && id){
+                    const errorMessage = `Error: ${name} with ID ${id} is not found.`;
+                    spinner.fail(errorMessage);
+                }
+            } else if(error.response.status === 401){
+                if(apiKey){
+                    const errorMessage = `Error: The provided API KEY "${apiKey}" is not authorized. Verify that the key is correct.`;
+                    spinner.fail(errorMessage);
+                }
+            } else if(error.message) {
+                spinner.fail(`Error: ${error.message}`);
+            } else {
+                spinner.fail(`Uncatched error with status code: ${error.response.status}`);
             }
+        } else if(error && error.code && error.code === 'ENOTFOUND') {
+            spinner.fail(`Cannot find the server: ${HOST}`);
+        } else {            
+            spinner.fail(`Uncatched error`);
+        }
+
+        if(DEBUG){
+            console.log('error', error);
         }
 
         process.exit(1);
@@ -628,6 +657,10 @@ if(argv){
 
     if(argv.host){
         HOST = argv.host;
+    }
+
+    if(argv.debug){
+        DEBUG = argv.debug;
     }
 
     if(argv.method){
