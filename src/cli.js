@@ -150,7 +150,7 @@ function finishCLI(result) {
     }
 
     console.log('exit code :', code);
-
+    process.exit(code);
 }
 
 
