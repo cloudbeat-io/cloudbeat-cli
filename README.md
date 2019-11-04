@@ -25,6 +25,8 @@ Following command will execute the specified Suite, wait for the tests to finish
 Exit code can be controlled with `--fail-on-errors` (true or false). Default is true.
 For example ```--fail-on-errors=true```
 
+You can see full error using debug mode `--debug` (true or false). Default is false.
+For example ```--debug=true```
 
 ## Development (using mockup server):
 
