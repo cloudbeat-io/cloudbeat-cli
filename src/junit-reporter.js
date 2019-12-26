@@ -151,6 +151,10 @@ function populateTestRunResult(obj, builder) {
                         if(failure.details && typeof failure.details === 'string'){
                             caseFailedMessage += failure.details;
                         }
+
+                        if(obj.domain){
+                            caseFailedMessage += '\n Test Result: '+obj.domain+'/#/results/'+data.id;
+                        }
                     }
                 }
 
