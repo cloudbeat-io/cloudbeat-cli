@@ -713,6 +713,31 @@ if(argv){
                 console.error('get_run_status method requires folder and id parameter');
                 process.exit(1);
             }
+        } else if(argv.method === "get_run_result" ){
+            if(argv.runId){
+                const runResult = getRunResult(argv.runId)
+        
+                if(runResult instanceof Promise){
+                    runResult.then((result)=>{
+                        
+                        if(result && result.error){
+                            if(typeof spinner !== 'undefined'){
+                                spinner.fail(result.error+', check you input data');
+                            } else {
+                                console.error(result.error);
+                            }
+                        }
+        
+                        if(result && result.data && result.data.data && result.data.data.data){
+                            reportResult(result.data.data.data);
+                        }
+                    });
+                }
+
+            } else {
+                console.error('get_run_result method requires folder and id parameter');
+                process.exit(1);
+            }
         } else {
             console.error('method name is not correct');
             process.exit(1);
