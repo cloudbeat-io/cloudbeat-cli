@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2017 CloudBeat Limited
+ * Copyright (C) 2015-present CloudBeat Limited
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,14 +10,11 @@
 /*
  * Oxygen Reporter abstract class
  */
-
-function ReporterBase(results, options) {
-    this.results = results;
-    this.options = options;
+export default class ReporterBase {
+    constructor(options) {
+        this.options = options;
+    }
+    generate(results) {
+        throw new Error('Abstract class, method not implemented');
+    }
 }
-
-ReporterBase.prototype.generate = function() {
-    throw new Error('Abstract class, method not implemented');
-};
-
-module.exports = ReporterBase;
