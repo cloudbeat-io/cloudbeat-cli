@@ -1,6 +1,6 @@
 {
   "name": "cloudbeat-cli",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "CloudBeat API CLI wrapper",
   "main": "build/index.js",
   "scripts": {
