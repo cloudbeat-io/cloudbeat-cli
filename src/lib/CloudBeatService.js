@@ -72,7 +72,7 @@ export default class CloudBeatService {
                 } else {
                     msg = statusResult.status;
                 }
-            } else {   
+            } else {
                 msg = statusResult.status;
             }
 
@@ -86,20 +86,20 @@ export default class CloudBeatService {
         }
         
         if(statusResult.status === statuses.Finished){
-            console.log('Test with run id: '+runId +' finished successful');
+            console.log('Test with run id ' + runId + ' has been completed');
             resolve();
         }
                         
         if(statusResult.status === statuses.Canceled){
-            console.log('Test with run id: '+runId +' finished canceled');
+            console.log('Test with run id ' + runId + ' has been canceled');
             resolve();
         }
     }
 
     async _waitForRunToFinish(runId) {
         this.poolingMessages = [];
-        await new Promise(resolve => setInterval(() => { 
-            this.handleRealPooling(runId, resolve); 
+        await new Promise(resolve => setInterval(() => {
+            this.handleRealPooling(runId, resolve);
         }, RUN_POOLING_INTERVAL));
     }
 }
