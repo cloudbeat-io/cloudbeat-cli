@@ -19,7 +19,7 @@ export default class CloudBeatApi {
                 return (status >= 200 && status < 300) || status == 304; // default
             }
         });
-        this.http.defaults.httpsAgent = Agent;        
+        this.http.defaults.httpsAgent = Agent;
     }
 
     async testCaseRun(caseId) {
@@ -29,8 +29,17 @@ export default class CloudBeatApi {
         }
         return response.data.data;
     }
+
     async testSuiteRun(suiteId) {
         const response = await this._post(`${this.host}${API_ENDPOINTS.SUITES}/${suiteId}/run?apiKey=${this.apiKey}`);
+        if (!response.data || !response.data.data || !response.data.data.id) {
+            throw new CloudBeatApiError('Invalid response, "data.id" is missing.');
+        }
+        return response.data.data;
+    }
+
+    async testMonitorRun(monitorId) {
+        const response = await this._post(`${this.host}${API_ENDPOINTS.MONITORS}/${monitorId}/run?apiKey=${this.apiKey}`);
         if (!response.data || !response.data.data || !response.data.data.id) {
             throw new CloudBeatApiError('Invalid response, "data.id" is missing.');
         }

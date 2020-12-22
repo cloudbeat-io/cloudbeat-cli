@@ -28,11 +28,13 @@ export default async function(testId, testType, apiKey, {
         apiKey: apiKey
     });
 
-    try {        
+    try {
         let result = null;
 
         if (testType === 'case') {
             result = await cb.runCase(testId);
+        } else if (testType === 'monitor') {
+            result = await cb.runMonitor(testId);
         } else {
             result = await cb.runSuite(testId);
         }

@@ -38,6 +38,18 @@ export default class CloudBeatService {
         const result = await this.api.testResultGet(newRun.id);
         return result;
     }
+    async runMonitor(monitorId) {
+        let initString = `Trying to run monitor: ${monitorId}`;
+        console.log(initString);
+
+        const newRun = await this.api.testMonitorRun(monitorId);
+        if (!newRun) {
+            throw new Error(`Unable to start a new run for monitor: ${monitorId}`);
+        }
+        await this._waitForRunToFinish(newRun.id);
+        const result = await this.api.testResultGet(newRun.id);
+        return result;
+    }
     getResult(resultId) {
 
     }
