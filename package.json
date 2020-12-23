@@ -16,7 +16,7 @@
     "lint": "eslint \"src/**/*.js\""
   },
   "bin": {
-    "cloudbeat-cli": "build/index.js"
+    "cloudbeat-cli": "./build/index.js"
   },
   "repository": {
     "type": "git",
