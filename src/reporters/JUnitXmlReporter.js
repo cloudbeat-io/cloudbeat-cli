@@ -69,7 +69,9 @@ function populateTestRunResult(obj, builder) {
                         }
 
                         if(obj.domain){
-                            caseFailedMessage += '\n Test Result: '+obj.domain+'/#/results/'+data.id;
+                            // old CB API will return just the domain so we add HTTPS schema manually
+                            var cbHost = obj.domain.startsWith('http') ? obj.domain : 'https://' + obj.domain;
+                            caseFailedMessage += '\n Test Result: '+cbHost+'/#/results/'+data.id;
                         }
                     }
                 }
