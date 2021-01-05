@@ -48,7 +48,7 @@
     "@babel/register": "7.8.6",
     "colors": "1.4.0",
     "commander": "4.1.1",
-    "axios": "0.19.2",
+    "axios": "0.21.1",
     "date-format": "0.0.2",
     "mkdirp": "0.5.1",
     "moment": "2.29.1",
