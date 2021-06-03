@@ -58,7 +58,7 @@ export default class CloudBeatService {
         const statusResult = await this.api.runGetStatus(runId);
         let msg = 'Run status: ';
         if(statusResult.progress){
-            msg += statusResult.status+' '+(statusResult.progress*100)+'%';
+            msg += statusResult.status+' '+(statusResult.progress*100).toFixed(0)+'%';
         } else {
             msg += statusResult.status;
         }
@@ -80,7 +80,7 @@ export default class CloudBeatService {
             let msg;         
             if(statuses.Running === statusResult.status){
                 if(statusResult.progress){
-                    msg = statusResult.status+' '+(statusResult.progress*100)+'%';
+                    msg = statusResult.status+' '+(statusResult.progress*100).toFixed(0)+'%';
                 } else {
                     msg = statusResult.status;
                 }
