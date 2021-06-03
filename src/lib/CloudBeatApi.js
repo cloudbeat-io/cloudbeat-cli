@@ -4,7 +4,7 @@ import https from 'https';
 import CloudBeatApiError from './CloudBeatApiError';
 import * as API_ENDPOINTS from './endpoints';
 
-const DEFAULT_HOST = 'http://ec2-18-185-75-225.eu-central-1.compute.amazonaws.com:81';
+const DEFAULT_HOST = 'https://api.cloudbeat.io';
 
 export default class CloudBeatApi {
     constructor({ host, apiKey }) {
