@@ -12,11 +12,11 @@ Following command will execute the specified Suite, wait for the tests to finish
 
 #### Get specified run status:
 Method can be used for getting status of an already running test:
-```cloudbeat-cli run-status <runId> <apiKey> [host] ```
+```cloudbeat-cli run-status <runId> <apiKey> [host]```
 
 #### Get test result for specified test run:
 Method can be used for getting status of an finished test:
-```cloudbeat-cli --method=pack_and_send --id=[id] --apiKey=[apiKey]```
+```cloudbeat-cli run-result <runId> <apiKey> [host]```
 
 
 #### Additional parameters
