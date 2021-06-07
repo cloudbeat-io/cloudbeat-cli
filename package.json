@@ -4,7 +4,7 @@
   "description": "CloudBeat API CLI wrapper",
   "main": "build/index.js",
   "scripts": {
-    "build": "run-s clean compile",
+    "build": "run-s clean lint compile",
     "clean": "rimraf ./build",
     "compile": "babel src/ -d build/ --config-file ./babel.config.js --copy-files",
     "prod": "cross-env ./build/index.js",
