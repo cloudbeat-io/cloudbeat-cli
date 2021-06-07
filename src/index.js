@@ -5,12 +5,13 @@ import colors from 'colors';
 import runCmd from './cli-commands/run';
 import runStatusCmd from './cli-commands/run-status';
 import runResultCmd from './cli-commands/run-result';
+import { version } from '../package.json';
 
 let noCommandExecuted = true;
 
 // general
 program
-.description('A CloudBeat CLI service')
+.description('CloudBeat CLI service v' + version)
 .name('cloudbeat-cli')
 .usage('<command> [options]')
 .option('-foe, --failOnErrors <fail-on-errors>', 'controls whether to return non-successful exit code on errors or not')
