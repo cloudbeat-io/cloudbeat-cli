@@ -15,88 +15,114 @@ import builder from '../../junit-report-builder';
 import FileReporterBase from '../lib/FileReporterBase';
 
 function populateTestRunResult(obj, builder) {
-
-    let instances;
-    let iterationList;
     const data = obj.result;
-
-    if(obj && obj.instances && Array.isArray(obj.instances)){
-        instances = obj.instances;
-
-        if(Array.isArray(instances) && instances[0] && instances[0].iterationList && Array.isArray(instances[0].iterationList)){
-            iterationList = instances[0].iterationList;
-        }
-    }
-
-
-    var suite = builder.testSuite()
-    .time(formatTime(data.duration))
+    const suite = builder.testSuite()
     .id(data.id)
-    .name(data.testName);
+    .name(data.testName)
+    .time(formatTime(data.duration));
 
-    if(obj && obj.cases){
-        obj.cases.map((item, index) => {       
-
-            let caseDuration = 0;
-            let caseFailedMessage = '';
-                        
-            if(
-                iterationList && 
-                Array.isArray(iterationList) && 
-                iterationList[index] && 
-                iterationList[index].stepList
-            ) {
-                const stepList = iterationList[index].stepList || [];
-                
-                caseDuration = getCaseDuration(stepList);
-
-                if(iterationList[index].failure){
-                
-                    const failure = iterationList[index].failure || {};
-    
-                    if(failure){
-                        
-                        if(failure.type && typeof failure.type === 'string'){
-                            caseFailedMessage += failure.type+' - ';
+    if(obj) {
+        if (Array.isArray(obj.cases) && obj.cases.length > 0) {
+            obj.cases.map((casesItem, index) => {
+                const iterationList = [];
+                if (obj && obj.instances && Array.isArray(obj.instances)) {
+                    obj.instances.map((instancesItem) => {
+                        if (instancesItem.iterationList && Array.isArray(instancesItem.iterationList) && instancesItem.iterationList.length > 0) {
+                            instancesItem.iterationList.map((iterationListItem) => {
+                                if (iterationListItem.caseId === casesItem.testCaseId) {
+                                    iterationListItem.browserName = instancesItem.browserName;
+                                    iterationListItem.deviceName = instancesItem.deviceName;
+                                    iterationList.push(iterationListItem);
+                                }
+                            });
                         }
-
-                        if(failure.message && typeof failure.message === 'string'){
-                            caseFailedMessage += failure.message;
-                        }
-                        
-                        if(failure.details && typeof failure.details === 'string'){
-                            caseFailedMessage += failure.details;
-                        }
-
-                        if(obj.domain){
-                            // old CB API will return just the domain so we add HTTPS schema manually
-                            var cbHost = obj.domain.startsWith('http') ? obj.domain : 'https://' + obj.domain;
-                            caseFailedMessage += '\n Test Result: '+cbHost+'/#/results/'+data.id;
-                        }
-                    }
+                    });
                 }
 
-            }
-            
-            if(item.isSuccess){
-                suite.testCase()
-                .time(formatTime(caseDuration))
-                .id(item.testCaseId)
-                .name(item.caseName);
-            } else {
-                suite.testCase()
-                .time(formatTime(caseDuration))
-                .id(item.testCaseId)
-                .name(item.caseName)
-                .failure(caseFailedMessage);
-            }  
-        });
+                if(iterationList && Array.isArray(iterationList) && iterationList.length > 0){
+                    iterationList.map((iterationListItem) => {
+                        const stepList = iterationListItem.stepList || [];
+                        let caseDuration = 0;
+                        let caseFailedMessage = '';
+                        caseDuration = getCaseDuration(stepList);
+
+                        if (iterationListItem.failure) {
+                            const failure = iterationListItem.failure || {};
+                            if (failure) {
+                                if (failure.type && typeof failure.type === 'string') {
+                                    caseFailedMessage += failure.type+' - ';
+                                }
+                                if (failure.message && typeof failure.message === 'string') {
+                                    caseFailedMessage += failure.message;
+                                }
+                                if (failure.details && typeof failure.details === 'string') {
+                                    caseFailedMessage += failure.details;
+                                }
+                                if (obj.domain) {
+                                    // old CB API will return just the domain so we add HTTPS schema manually
+                                    const cbHost = obj.domain.startsWith('http') ? obj.domain : 'https://' + obj.domain;
+                                    caseFailedMessage += '\n Test Result: '+cbHost+'/#/results/'+data.id;
+                                }
+                            }
+                        }
+
+                        let testCase;
+                        if (casesItem.isSuccess) {
+                            testCase = suite.testCase()
+                            .id(casesItem.testCaseId)
+                            .name(casesItem.caseName)
+                            .time(formatTime(caseDuration));
+                        } else {
+                            testCase = suite.testCase()
+                            .id(casesItem.testCaseId)
+                            .name(casesItem.caseName)
+                            .time(formatTime(caseDuration))
+                            .failure(caseFailedMessage);
+                        }
+
+                        if (iterationListItem.browserName) {
+                            testCase.browserName(iterationListItem.browserName);
+                        }
+
+                        if (iterationListItem.deviceName) {
+                            testCase.deviceName(iterationListItem.deviceName);
+                        }
+                    });
+                } else {
+                    if (casesItem.isSuccess) {
+                        suite.testCase()
+                        .id(casesItem.testCaseId)
+                        .name(casesItem.caseName);
+                    } else {
+                        suite.testCase()
+                        .id(casesItem.testCaseId)
+                        .name(casesItem.caseName);
+                    }  
+                }
+            });
+        } else if(Array.isArray(obj.instances) && obj.instances.length > 0) {
+            // Unable to start instance error
+            obj.instances.map((iterationListItem, idx) => {
+                const testCase = suite.testCase()
+                .id(idx)
+                .name(idx)
+                .failure(iterationListItem.failureJson);
+                
+                if (iterationListItem.browserName) {
+                    testCase.browserName(iterationListItem.browserName);
+                }
+
+                if (iterationListItem.deviceName) {
+                    testCase.deviceName(iterationListItem.deviceName);
+                }
+            });
+        }
     }
 }
 
 const formatTime = (time) => {
     try{
-        if(time && time.toFixed){
+        if (time && time.toFixed) {
             return time.toFixed(2);
         } else {
             return time;
@@ -111,15 +137,15 @@ const getCaseDuration = (stepList) => {
     try{
         let result = 0;
 
-        if(stepList && Array.isArray(stepList)){
+        if (stepList && Array.isArray(stepList)) {
             stepList.map((item) => {
-                if(item && item.duration && typeof item.duration === 'number'){
+                if (item && item.duration && typeof item.duration === 'number') {
                     result += item.duration;
                 }
             });
         }
 
-        if(result > 0){
+        if (result > 0) {
             result = result/1000;
         }
 
@@ -151,15 +177,5 @@ export default class JUnitXmlReporter extends FileReporterBase {
             return resultFilePath;
 
         }
-
-        // for (let result of result) {
-        //     for (let suite of result.suites) {
-        //         this._populateSuiteResults(suite, builder);
-        //     }
-        // }
-
-        // builder.writeTo(resultFilePath);
-
-        // return resultFilePath;
     }
 }
