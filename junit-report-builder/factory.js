@@ -6,15 +6,15 @@ function Factory() {
 }
 
 Factory.prototype.newBuilder = function () {
-  return new Builder(this);
+    return new Builder(this);
 };
 
 Factory.prototype.newTestSuite = function () {
-  return new TestSuite(this);
+    return new TestSuite(this);
 };
 
 Factory.prototype.newTestCase = function () {
-  return new TestCase(this);
+    return new TestCase(this);
 };
 
 module.exports = Factory;
