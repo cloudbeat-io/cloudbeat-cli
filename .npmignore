@@ -1,1 +1,5 @@
 src/*
+test/*
+*.xml
+.eslintrc.json
+babel.config.js
