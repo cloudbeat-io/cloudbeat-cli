@@ -83,6 +83,11 @@ export default class CloudBeatApi {
     async runGetResult(runId) {
         const url = `${this.host}${API_ENDPOINTS.RESULTS}/run/${runId}?apiKey=${this.apiKey}`;
         const response = await this._get(url);
+
+        if (response && response.data && response.data.statusCode === 202) {
+            throw new CloudBeatApiError('Still running');
+        }
+
         if (!response.data || !response.data.data) {
             throw new CloudBeatApiError('Invalid response, "data" is missing.');
         }
