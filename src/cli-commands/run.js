@@ -67,13 +67,11 @@ export default async function(testId, testType, apiKey, {
         }
     } catch (e) {
         let msg = 'Test execution failed:';
-        if(e && e.message){
-            msg += ' '+e.message;
+        if (e && e.message){
+            msg += ' ' + e.message;
         }
-        if(e && e.path){
-            msg += ' Path: '+e.path;
-        }
-        console.log(msg);
+        console.error(msg);
+        console.error(e);
         helper.finishCLI(failOnErrors);
     }
 }
