@@ -51,7 +51,7 @@ export default async function(testId, testType, apiKey, {
                     reporterOpt.targetFolder = folder;
                     reporterOpt.cwd = folder;
                 } else {
-                    console.error(`Folder "${folder}" did not exist`);
+                    console.error(`Folder "${folder}" does not exist`);
                     helper.finishCLI(failOnErrors);
                 }
             } else {
