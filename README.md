@@ -9,6 +9,7 @@
 #### Run specified test case or suite in CloudBeat
 Following command will execute the specified Case or Suite, wait for the tests to finish, and will produce XML report in JUnit format: 
 ```cloudbeat-cli run <testId> <testType> <apiKey> [host] [folder]```
+If test execution succeeds exit code will be 0. Otherwise exit code will be 1.
 
 Arguments:
 
@@ -33,4 +34,5 @@ Usage example:
 #### Additional parameters
 
 Exit code can be controlled with `--failOnErrors` (true or false). Default is true.
-For example `--failOnErrors=true`
+For example:
+`cloudbeat-cli --failOnErrors=false run 70224 case AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEE https://api.cloudbeat.io`
