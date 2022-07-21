@@ -14,16 +14,19 @@ import fs from 'fs';
 import path from 'path';
 import moment from 'moment';
 
-import ReporterBase from './ReporterBase';
+import { IReporterOptions } from '../../types/IReporterOptions';
+import { ReporterBase } from './ReporterBase';
 
 const REPORT_FILE_NAME = 'report';
 
-export default class FileReporterBase extends ReporterBase {
-    constructor(options) {
+export class FileReporterBase extends ReporterBase {
+    constructor(
+        protected options: IReporterOptions,
+    ) {
         super(options);
     }
-    createFolderStructureAndFilePath(fileExtension) {
-        if (!fileExtension || typeof fileExtension !== 'string' || fileExtension.length == 0) {
+    createFolderStructureAndFilePath(fileExtension: string) {
+        if (!fileExtension || typeof fileExtension !== 'string' || fileExtension.length === 0) {
             throw new Error('"fileExtension" argument must be specified');
         }
         // if fileExtension doesn't start with '.', add it automatically
@@ -36,26 +39,29 @@ export default class FileReporterBase extends ReporterBase {
         const resultsBaseFolder = this.options.cwd;
         // create results main folder (where all the results for the current test case or test suite are stored)
         this.createFolderIfNotExists(resultsBaseFolder);
-        let resultFolderPath = resultsBaseFolder;
+        const resultFolderPath = resultsBaseFolder;
         let timeSuffix = '';
         // create timestamp-based file name for the current results if "timeSuffix" property is specified
         if (this.options.timeSuffix) {
-            timeSuffix = '-' + moment().format('YYYY-MM-DD_HHmmss');
-        }        
+            timeSuffix = `-${moment().format('YYYY-MM-DD_HHmmss')}`;
+        }
         return path.join(resultFolderPath, `${REPORT_FILE_NAME}${timeSuffix}${fileExtension}`);
 
     }
-    createFolderIfNotExists(folderPath) {
+    createFolderIfNotExists(folderPath: string) {
         try {
             fs.mkdirSync(folderPath);
-        } catch(e) {
-            if ( e.code != 'EEXIST' ) throw e;
+        }
+        catch(e: any) {
+            if (e.code !== 'EEXIST') {
+                throw e;
+            }
         }
         return folderPath;
     }
 
     // save all screenshots to files and replace screenshot content with file path in the result JSON before serialization
-    replaceScreenshotsWithFiles(result, folderPath) {
+    replaceScreenshotsWithFiles(result: any, folderPath: string) {
         if (!folderPath) {
             throw new Error('"folderPath" argument cannot be null or empty.');
         }
@@ -82,8 +88,8 @@ export default class FileReporterBase extends ReporterBase {
         //     step.screenshot = null; // don't save base64 screenshot date to the file
         // }
     }
-    _populateStepsWithScreenshots(steps, stepsWithScreenshot) {
-        for (let step of steps) {
+    _populateStepsWithScreenshots(steps: any[], stepsWithScreenshot: any[]) {
+        for (const step of steps) {
             if (step.screenshot) {
                 stepsWithScreenshot.push(step);
             }

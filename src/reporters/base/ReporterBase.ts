@@ -7,14 +7,17 @@
  * (at your option) any later version.
  */
 
+import { IReporterOptions } from '../../types/IReporterOptions';
+
 /*
  * Oxygen Reporter abstract class
  */
-export default class ReporterBase {
-    constructor(options) {
-        this.options = options;
+export class ReporterBase {
+    constructor(
+        protected options: IReporterOptions,
+    ) {
     }
-    generate(results) {
+    generate(results: any) {
         throw new Error('Abstract class, method not implemented');
     }
 }

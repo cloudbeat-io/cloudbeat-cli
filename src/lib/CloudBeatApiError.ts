@@ -1,10 +1,12 @@
-export default class CloudBeatApiError extends Error {
-    constructor(msgOrError) {
+export class CloudBeatApiError extends Error {
+    private path?: string;
+
+    constructor(msgOrError: any) {
         super(typeof msgOrError === 'string' ? msgOrError : undefined);
         this.name = this.constructor.name;
 
-        if (msgOrError instanceof Error && msgOrError.response) {
-            const response = msgOrError.response;
+        if (msgOrError instanceof Error && (msgOrError as any).response) {
+            const { response } = msgOrError as any;
             if (response.status === 500) {
                 this.message = 'Internal server error, please try again later.';
             }
@@ -31,11 +33,12 @@ export default class CloudBeatApiError extends Error {
                     }
                     if(response.data.errors && Array.isArray(response.data.errors) && response.data.errors.length > 0){
                         message += ':';
-                        response.data.errors.map((msg) => {
-                            message += ' '+msg;
+                        response.data.errors.map((msg: string) => {
+                            message += ` ${  msg}`;
                         });
                     }
-                } else {
+                }
+ else {
                     message = 'Validation Failed';
                 }
 
@@ -44,7 +47,7 @@ export default class CloudBeatApiError extends Error {
             else {
                 this.message = response.statusText;
             }
-        }        
+        }
         Error.captureStackTrace(this, this.constructor);
     }
 }

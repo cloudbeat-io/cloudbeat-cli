@@ -7,15 +7,19 @@ const statuses = {
     Initializing: 'Initializing',
     Running: 'Running',
     Finished: 'Finished',
-    Canceled: 'Canceled'
+    Canceled: 'Canceled',
 };
 
-export default class CloudBeatService {
-    constructor({ host, apiKey }) {
+export class CloudBeatService {
+    private readonly api: CloudBeatApi;
+    private poolingMessages: any[] = [];
+
+    constructor({ host, apiKey }: { host?: string; apiKey: string }) {
         this.api = new CloudBeatApi({ host, apiKey });
     }
-    async runCase(caseId) {
-        let initString = `Trying to run case: ${caseId}`;
+
+    async runCase(caseId: string) {
+        const initString = `Trying to run case: ${caseId}`;
         console.log(initString);
 
         const newRun = await this.api.testCaseRun(caseId);
@@ -26,8 +30,8 @@ export default class CloudBeatService {
         const result = await this.api.testResultGet(newRun.id);
         return result;
     }
-    async runSuite(suiteId) {
-        let initString = `Trying to run suite: ${suiteId}`;
+    async runSuite(suiteId: string) {
+        const initString = `Trying to run suite: ${suiteId}`;
         console.log(initString);
 
         const newRun = await this.api.testSuiteRun(suiteId);
@@ -38,8 +42,8 @@ export default class CloudBeatService {
         const result = await this.api.testResultGet(newRun.id);
         return result;
     }
-    async runMonitor(monitorId) {
-        let initString = `Trying to run monitor: ${monitorId}`;
+    async runMonitor(monitorId: string) {
+        const initString = `Trying to run monitor: ${monitorId}`;
         console.log(initString);
 
         const newRun = await this.api.testMonitorRun(monitorId);
@@ -50,67 +54,71 @@ export default class CloudBeatService {
         const result = await this.api.testResultGet(newRun.id);
         return result;
     }
-    getResult(resultId) {
+    getResult(resultId: string) {
 
     }
 
-    async getRunStatus(runId) {
+    async getRunStatus(runId: string) {
         const statusResult = await this.api.runGetStatus(runId);
         let msg = 'Run status: ';
-        if(statusResult.progress){
-            msg += statusResult.status+' '+(statusResult.progress*100).toFixed(0)+'%';
-        } else {
+        if (statusResult.progress) {
+            msg += `${statusResult.status} ${(statusResult.progress*100).toFixed(0)}%`;
+        }
+ else {
             msg += statusResult.status;
         }
 
         console.log(msg);
     }
 
-    async getRunResult(runId) {
+    async getRunResult(runId: string) {
         const result = await this.api.runGetResult(runId);
         const json = JSON.stringify(result, null, 4);
         console.log(`Run result:\n${json}`);
         return result;
     }
 
-    async handleRealPooling(runId, resolve){
+    async handleRealPooling(runId: string, resolve: () => void){
         const statusResult = await this.api.runGetStatus(runId);
         if([statuses.Pending, statuses.Initializing, statuses.Running].includes(statusResult.status)){
-            // waiting   
-            let msg;         
+            // waiting
+            let msg;
             if(statuses.Running === statusResult.status){
                 if(statusResult.progress){
-                    msg = statusResult.status+' '+(statusResult.progress*100).toFixed(0)+'%';
-                } else {
+                    msg = `${statusResult.status} ${(statusResult.progress*100).toFixed(0)}%`;
+                }
+ else {
                     msg = statusResult.status;
                 }
-            } else {
+            }
+ else {
                 msg = statusResult.status;
             }
 
             if(this.poolingMessages.includes(msg)){
                 // ignore
-            } else {
+            }
+ else {
                 this.poolingMessages.push(msg);
                 console.log(msg);
             }
 
         }
-        
-        if(statusResult.status === statuses.Finished){
-            console.log('Test with run id ' + runId + ' has been completed');
+
+        if (statusResult.status === statuses.Finished) {
+            console.log(`Test with run id ${runId} has been completed`);
             resolve();
         }
-                        
-        if(statusResult.status === statuses.Canceled){
-            console.log('Test with run id ' + runId + ' has been canceled');
+
+        if (statusResult.status === statuses.Canceled) {
+            console.log(`Test with run id ${runId} has been canceled`);
             resolve();
         }
     }
 
-    async _waitForRunToFinish(runId) {
+    async _waitForRunToFinish(runId: string) {
         this.poolingMessages = [];
-        await new Promise(resolve => setInterval(() => {
+        await new Promise((resolve: any) => setInterval(() => {
             this.handleRealPooling(runId, resolve);
         }, RUN_POOLING_INTERVAL));
     }

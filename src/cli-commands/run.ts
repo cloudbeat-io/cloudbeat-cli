@@ -1,15 +1,16 @@
 import fs from 'fs';
-import CloudBeatService from '../lib/CloudBeatService';
-import * as DEFAULTS from '../lib/defaults';
-import helper from '../lib/helper';
+import { CloudBeatService } from '../lib/CloudBeatService';
+import * as DEFAULTS from '../lib/const/defaults';
+import * as helper from '../lib/helper';
+import { IReporterOptions } from '../types/IReporterOptions';
 
-export default async function(testId, testType, apiKey, {
-    host = null,
+export default async function(testId: string, testType: string, apiKey: string, {
+    host = undefined,
     cwd = process.cwd(),
     format = DEFAULTS.TEST_REPORT_FORMAT,
-    folder = null,
+    folder = undefined,
     failOnErrors = true,
-    debug = false
+    debug = false,
 }) {
     if (!testId) {
         console.error('"testId" argument must be specified.');
@@ -25,7 +26,7 @@ export default async function(testId, testType, apiKey, {
     }
     const cb = new CloudBeatService({
         host: host,
-        apiKey: apiKey
+        apiKey: apiKey,
     });
 
     try {
@@ -33,42 +34,48 @@ export default async function(testId, testType, apiKey, {
 
         if (testType === 'case') {
             result = await cb.runCase(testId);
-        } else if (testType === 'monitor') {
+        }
+        else if (testType === 'monitor') {
             result = await cb.runMonitor(testId);
-        } else {
+        }
+        else {
             result = await cb.runSuite(testId);
         }
 
         if (result) {
             // set reporter settings
-            var reporterOpt = {
+            const reporterOpt: IReporterOptions = {
                 method: 'saveTestRunResults',
-                targetFolder: 'results'
+                targetFolder: 'results',
+                cwd: undefined,
             };
 
-            if(folder){
+            if (folder) {
                 if (fs.existsSync(folder)) {
                     reporterOpt.targetFolder = folder;
                     reporterOpt.cwd = folder;
-                } else {
-                    console.error(`Folder "${folder}" does not exist`);
+                }
+                else {
+                    console.error(`Folder "${folder}" does not exist`); // eslint-disable-line @typescript-eslint/restrict-template-expressions
                     helper.finishCLI(failOnErrors);
                 }
-            } else {
+            }
+            else {
                 reporterOpt.targetFolder = cwd;
                 reporterOpt.cwd = cwd;
             }
-            
+
             const reporter = helper.getReporterInstance(format, reporterOpt);
             const reportFilePath = reporter.generate(result.data.data);
             console.log(`The report is ready: ${reportFilePath}`);
 
             helper.finishCLI(failOnErrors, result.data.data);
         }
-    } catch (e) {
+    }
+    catch (e: any) {
         let msg = 'Test execution failed:';
         if (e && e.message){
-            msg += ' ' + e.message;
+            msg += ` ${  e.message}`;
         }
         console.error(msg);
         console.error(e);

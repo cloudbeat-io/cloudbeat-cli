@@ -1,22 +1,25 @@
 #! /usr/bin/env node
 
-import program from 'commander';
+// import program from 'commander';
 import colors from 'colors';
+import { Command } from 'commander';
+const program = new Command();
 import runCmd from './cli-commands/run';
-import runStatusCmd from './cli-commands/run-status';
 import runResultCmd from './cli-commands/run-result';
-import { version } from '../package.json';
+import runStatusCmd from './cli-commands/run-status';
+
+const { version } = require('../package.json');
 
 let noCommandExecuted = true;
 
 // general
 program
-.description('CloudBeat CLI service v' + version)
+.description(`CloudBeat CLI service v${  version}`)
 .name('cloudbeat-cli')
 .usage('<command> [options]')
 .option('-foe, --failOnErrors <fail-on-errors>', 'controls whether to return non-successful exit code on errors or not')
 .option('-dbg, --debug <debug>', 'print debug information during execution');
-//.option('-f, --format <format>', 'test result format for run command. Default is `junit`.');
+// .option('-f, --format <format>', 'test result format for run command. Default is `junit`.');
 
 // run command
 program
@@ -31,7 +34,7 @@ program
         format: program.format,
         folder: folder,
         failOnErrors: program.failOnErrors,
-        debug: program.debug
+        debug: program.debug,
     });
 });
 
@@ -42,10 +45,10 @@ program
 .action((runId, apiKey, host = null) => {
     noCommandExecuted = false;
 
-    runStatusCmd(runId, apiKey, { 
+    runStatusCmd(runId, apiKey, {
         host,
         failOnErrors: program.failOnErrors,
-        debug: program.debug
+        debug: program.debug,
     });
 });
 
@@ -57,21 +60,21 @@ program
     noCommandExecuted = false;
     runResultCmd(runId, apiKey, host, {
         failOnErrors: program.failOnErrors,
-        debug: program.debug
+        debug: program.debug,
     });
 });
 
 program.parse(process.argv);
 
+const makeRed = (txt: string) => {
+    return colors.red(txt); // display the help text in red on the console
+};
+
 if (noCommandExecuted) {
     program.outputHelp(makeRed);
 }
-  
-function makeRed(txt) {
-    return colors.red(txt); //display the help text in red on the console
-}
 
-process.on('unhandledRejection', error => {
+process.on('unhandledRejection', (error: any) => {
     console.log('UnhandledRejection error: ', error.message);
 });
 
