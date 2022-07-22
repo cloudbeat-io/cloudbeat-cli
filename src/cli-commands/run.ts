@@ -10,7 +10,6 @@ export default async function(testId: string, testType: string, apiKey: string, 
     format = DEFAULTS.TEST_REPORT_FORMAT,
     folder = undefined,
     failOnErrors = true,
-    debug = false,
 }) {
     if (!testId) {
         console.error('"testId" argument must be specified.');
@@ -66,10 +65,15 @@ export default async function(testId: string, testType: string, apiKey: string, 
             }
 
             const reporter = helper.getReporterInstance(format, reporterOpt);
-            const reportFilePath = reporter.generate(result.data.data);
-            console.log(`The report is ready: ${reportFilePath}`);
-
-            helper.finishCLI(failOnErrors, result.data.data);
+            const resultData = result?.data?.data;
+            if (resultData) {
+                const reportFilePath = reporter.generate(result.data.data);
+                console.log(`The report is ready: ${reportFilePath}`);
+            }
+            else {
+                console.log('No results received from the server');
+            }            
+            helper.finishCLI(failOnErrors, resultData);
         }
     }
     catch (e: any) {

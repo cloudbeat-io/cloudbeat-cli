@@ -11,28 +11,34 @@ export class TestCase {
     private _errorAttachment?: any = undefined;
     private _errorContent?: string = undefined;
 
-    public set className(className: string) {
+    public className(className: string) {
         this._attributes.classname = className;
+        return this;
     }
 
-    public set id(className: string) {
+    public id(className: string) {
         this._attributes.id = className;
+        return this;
     }
 
-    public set name(name: string) {
+    public name(name: string) {
         this._attributes.name = name;
+        return this;
     }
 
-    public set time(timeInSeconds: number) {
+    public time(timeInSeconds: number) {
         this._attributes.time = timeInSeconds;
+        return this;
     }
 
-    public set browserName(browserName: string) {
+    public browserName(browserName: string) {
         this._attributes.browserName = browserName;
+        return this;
     }
 
-    public set deviceName(deviceName: string) {
+    public deviceName(deviceName: string) {
         this._attributes.deviceName = deviceName;
+        return this;
     }
 
     public failure(message: string, type: any) {
@@ -44,6 +50,7 @@ export class TestCase {
         if (type) {
             this._failureAttributes.type = type;
         }
+        return this;
     }
 
     public error(message: string, type: any, content: string) {
@@ -63,6 +70,7 @@ export class TestCase {
     public stacktrace(stacktrace: string) {
         this._failure = true;
         this._stacktrace = stacktrace;
+        return this;
     }
 
     skipped() {
