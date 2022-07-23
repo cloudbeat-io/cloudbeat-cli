@@ -5,6 +5,7 @@ import * as helper from '../lib/helper';
 import { IReporterOptions } from '../types/IReporterOptions';
 
 export default async function(testId: string, testType: string, apiKey: string, {
+    tags = undefined,
     host = undefined,
     cwd = process.cwd(),
     format = DEFAULTS.TEST_REPORT_FORMAT,
@@ -65,15 +66,13 @@ export default async function(testId: string, testType: string, apiKey: string, 
             }
 
             const reporter = helper.getReporterInstance(format, reporterOpt);
-            const resultData = result?.data?.data;
-            if (resultData) {
-                const reportFilePath = reporter.generate(result.data.data);
-                console.log(`The report is ready: ${reportFilePath}`);
-            }
-            else {
-                console.log('No results received from the server');
-            }            
-            helper.finishCLI(failOnErrors, resultData);
+            const reportFilePath = reporter.generate(result);
+            console.log(`The report is ready: ${reportFilePath}`);
+
+            helper.finishCLI(failOnErrors, result);
+        }
+        else {
+            console.log('No results received from the server');
         }
     }
     catch (e: any) {
