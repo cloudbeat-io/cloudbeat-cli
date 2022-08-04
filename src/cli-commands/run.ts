@@ -33,13 +33,13 @@ export default async function(testId: string, testType: string, apiKey: string, 
         let result = null;
 
         if (testType === 'case') {
-            result = await cb.runCase(testId);
+            result = await cb.runCase(testId, { testAttributes: tags });
         }
         else if (testType === 'monitor') {
-            result = await cb.runMonitor(testId);
+            result = await cb.runMonitor(testId, { testAttributes: tags });
         }
         else {
-            result = await cb.runSuite(testId);
+            result = await cb.runSuite(testId, { testAttributes: tags });
         }
 
         if (result) {

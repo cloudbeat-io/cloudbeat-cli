@@ -1,4 +1,4 @@
-import { ResultApi, RuntimeApi } from '@cloudbeat/client/v1';
+import { ResultApi, RunOptions, RuntimeApi } from '@cloudbeat/client/v1';
 import { RunStatus, RunStatusEnum } from '@cloudbeat/types';
 
 const RUN_POOLING_INTERVAL = 5000;
@@ -21,10 +21,10 @@ export class CloudBeatService {
         this.resultApi = new ResultApi(apiKey);
     }
 
-    async runCase(caseId: string | number) {
+    async runCase(caseId: string | number, options?: RunOptions) {
         console.log(`Trying to run case: ${caseId}`);
 
-        const newRunId = await this.runtimeApi.runTestCase(caseId as number);
+        const newRunId = await this.runtimeApi.runTestCase(caseId as number, options);
         if (!newRunId) {
             throw new Error(`Unable to start a new run for case: ${caseId}`);
         }
@@ -32,10 +32,10 @@ export class CloudBeatService {
         const result = await this.resultApi.getResultByRunId(newRunId);
         return result;
     }
-    async runSuite(suiteId: string) {
+    async runSuite(suiteId: string | number, options?: RunOptions) {
         console.log(`Trying to run suite: ${suiteId}`);
 
-        const newRunId = await this.runtimeApi.runTestSuite(suiteId);
+        const newRunId = await this.runtimeApi.runTestSuite(suiteId as number, options);
         if (!newRunId) {
             throw new Error(`Unable to start a new run for suite: ${suiteId}`);
         }
@@ -43,10 +43,10 @@ export class CloudBeatService {
         const result = await this.resultApi.getResultByRunId(newRunId);
         return result;
     }
-    async runMonitor(monitorId: string) {
+    async runMonitor(monitorId: string, options?: RunOptions) {
         console.log(`Trying to run monitor: ${monitorId}`);
 
-        const newRunId = await this.runtimeApi.runMonitor(monitorId);
+        const newRunId = await this.runtimeApi.runMonitor(monitorId, options);
         if (!newRunId) {
             throw new Error(`Unable to start a new run for monitor: ${monitorId}`);
         }

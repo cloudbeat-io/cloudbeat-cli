@@ -8,7 +8,7 @@
     "compile": "tsc",
     "build": "run-s clean lint compile",
     "prod": "cross-env ./build/index.js",
-    "debug": "cross-env DEBUG=true ts-node-dev --transpile-only src/index.ts",
+    "debug": "cross-env DEBUG=* ts-node-dev --transpile-only src/index.ts",
     "test": "run-s test:*",
     "test:eslint": "eslint src test",
     "test:unit": "jest",
