@@ -26,7 +26,7 @@ program
 .command('run <testId> <testType> <apiKey> [host] [folder]', { isDefault: true })
 .option('-t, --tags <tags>', 'comma separated tag list to be associated with the test result', tagsOptionParser)
 .description('run specified test case or suite in CloudBeat')
-.action((testId, testType, apiKey, host, folder, { tags=[] }) => {
+.action((testId, testType, apiKey, host, folder, { tags={} }) => {
     noCommandExecuted = false;
     runCmd(testId, testType, apiKey, {
         tags,
