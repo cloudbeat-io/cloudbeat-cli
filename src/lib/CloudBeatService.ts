@@ -73,8 +73,10 @@ export class CloudBeatService {
 
     async getRunResult(runId: string) {
         const result = await this.resultApi.getResultByRunId(runId);
-        const json = JSON.stringify(result, null, 4);
-        console.log(`Run result:\n${json}`);
+        if (result) {
+            const json = JSON.stringify(result, null, 4);
+            console.log(`Run result:\n${json}`);
+        }
         return result;
     }
 

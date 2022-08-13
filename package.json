@@ -1,8 +1,9 @@
 {
-  "name": "cloudbeat-cli",
-  "version": "1.0.0",
+  "name": "@cloudbeat/cli",
+  "version": "1.0.1-beta.3",
   "description": "CLI tool to wrap CloudBeat API",
-  "main": "build/index.js",
+  "main": "build/index",
+  "types": "build/index",
   "scripts": {
     "clean": "rimraf ./build ./out",
     "compile": "tsc",
@@ -24,9 +25,9 @@
     "url": "git+https://github.com/oxygenhq/cloudbeat-cli.git"
   },
   "author": {
-    "name": "CloudBeat Limited",
+    "name": "CBNR Cloud Solutions LTD",
     "email": "info@cloudbeat.io",
-    "url": "http://cloudbeat.io"
+    "url": "https://cloudbeat.io"
   },
   "license": "GPL-3.0",
   "bugs": {
@@ -47,10 +48,10 @@
     "mkdirp": "0.5.6",
     "moment": "^2.29.4",
     "xmlbuilder": "10.1.1",
-    "@cloudbeat/client": "file:../cb-js-commons/packages/client"
+    "@cloudbeat/client": "1.0.0-beta.3"
   },
   "devDependencies": {
-    "@cloudbeat/types": "file:../cb-js-commons/packages/types",
+    "@cloudbeat/types": "1.0.0-beta.2",
     "@types/node": "^16.10.1",
     "@types/request": "2.48.7",
     "@typescript-eslint/eslint-plugin": "^4.31.2",
@@ -70,5 +71,9 @@
     "ts-node": "^10.2.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^4.4.3"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   }
 }
