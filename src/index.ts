@@ -4,9 +4,9 @@
 import colors from 'colors';
 import { Command } from 'commander';
 const program = new Command();
-import startCmd from './cli-commands/start';
 import runResultCmd from './cli-commands/run-result';
 import runStatusCmd from './cli-commands/run-status';
+import startCmd from './cli-commands/start';
 
 const { version } = require('../package.json');
 
@@ -55,7 +55,7 @@ program
 
 // run-result command
 program
-.command('run-result <runId>', { isDefault: false, })
+.command('run-result <runId>', { isDefault: false })
 .description('get test result for the specified test run')
 .action((runId) => {
     noCommandExecuted = false;
