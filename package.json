@@ -1,6 +1,6 @@
 {
   "name": "@cloudbeat/cli",
-  "version": "1.0.1-beta.4",
+  "version": "1.0.1-beta.5",
   "description": "CLI tool to wrap CloudBeat API",
   "main": "build/index",
   "types": "build/index",
@@ -48,10 +48,10 @@
     "mkdirp": "0.5.6",
     "moment": "^2.29.4",
     "xmlbuilder": "10.1.1",
-    "@cloudbeat/client": "1.0.0-beta.3"
+    "@cloudbeat/client": "1.0.0-beta.4"
   },
   "devDependencies": {
-    "@cloudbeat/types": "1.0.0-beta.2",
+    "@cloudbeat/types": "1.0.0-beta.4",
     "@types/node": "^16.10.1",
     "@types/request": "2.48.7",
     "@typescript-eslint/eslint-plugin": "^4.31.2",
