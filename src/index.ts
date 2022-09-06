@@ -4,7 +4,7 @@
 import colors from 'colors';
 import { Command } from 'commander';
 const program = new Command();
-import runCmd from './cli-commands/run';
+import startCmd from './cli-commands/start';
 import runResultCmd from './cli-commands/run-result';
 import runStatusCmd from './cli-commands/run-status';
 
@@ -17,20 +17,22 @@ program
 .description(`CloudBeat CLI service v${  version}`)
 .name('cloudbeat-cli')
 .usage('<command> [options]')
-.option('-foe, --failOnErrors <fail-on-errors>', 'controls whether to return non-successful exit code on errors or not')
-.option('-dbg, --debug <debug>', 'print debug information during execution');
+.requiredOption('--apiKey <api-key>', 'your CloudBeat API key')
+.option('--apiBaseUrl <base-url>', 'URL to privately hosted CloudBeat instance')
+.option('-f, --failOnErrors <fail-on-errors>', 'controls whether to return non-successful exit code on errors or not')
+.option('-d, --debug <debug>', 'print debug information during execution');
 // .option('-f, --format <format>', 'test result format for run command. Default is `junit`.');
 
-// run command
+// start command
 program
-.command('run <testId> <testType> <apiKey> [host] [folder]', { isDefault: true })
+.command('start <testType> <testId> [folder]', { isDefault: true })
 .option('-t, --tags <tags>', 'comma separated tag list to be associated with the test result', tagsOptionParser)
-.description('run specified test case or suite in CloudBeat')
-.action((testId, testType, apiKey, host, folder, { tags={} }) => {
+.description('start running specified type of test (case, suite or monitor) in CloudBeat')
+.action((testType, testId, folder, { tags={} }) => {
     noCommandExecuted = false;
-    runCmd(testId, testType, apiKey, {
+    startCmd(testId, testType, program.apiKey, {
         tags,
-        host,
+        host: program.apiBaseUrl,
         cwd: folder,
         format: program.format,
         folder: folder,
@@ -40,13 +42,12 @@ program
 
 // run-status command
 program
-.command('run-status <runId> <apiKey> [host]', { isDefault: false })
+.command('run-status <runId>', { isDefault: false })
 .description('get specified run status')
-.action((runId, apiKey, host = null) => {
+.action((runId) => {
     noCommandExecuted = false;
-
-    runStatusCmd(runId, apiKey, {
-        host,
+    runStatusCmd(runId, program.apiKey, {
+        host: program.apiBaseUrl,
         failOnErrors: program.failOnErrors,
         debug: program.debug,
     });
@@ -54,11 +55,11 @@ program
 
 // run-result command
 program
-.command('run-result <runId> <apiKey> [host]', { isDefault: false })
+.command('run-result <runId>', { isDefault: false, })
 .description('get test result for the specified test run')
-.action((runId, apiKey, host = null) => {
+.action((runId) => {
     noCommandExecuted = false;
-    runResultCmd(runId, apiKey, host, {
+    runResultCmd(runId, program.apiKey, program.apiBaseUrl, {
         failOnErrors: program.failOnErrors,
         debug: program.debug,
     });

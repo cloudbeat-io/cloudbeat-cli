@@ -121,8 +121,12 @@ export class CloudBeatService {
 
     async _waitForRunToFinish(runId: string) {
         this.poolingMessages = [];
-        await new Promise((resolve: any) => setInterval(() => {
-            this.handleRealPooling(runId, resolve);
-        }, RUN_POOLING_INTERVAL));
+        let intervalId;
+        await new Promise((resolve: any) => {
+            intervalId = setInterval(() => {
+                this.handleRealPooling(runId, resolve);
+            }, RUN_POOLING_INTERVAL);
+        });
+        clearInterval(intervalId);
     }
 }
