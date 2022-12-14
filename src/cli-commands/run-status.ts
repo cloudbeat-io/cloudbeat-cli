@@ -11,7 +11,7 @@ export default async function(runId: string, apiKey: string, {
         helper.finishCLI(failOnErrors);
     }
     const cb = new CloudBeatService({
-        host: host,
+        apiBaseUrl: host,
         apiKey: apiKey,
     });
 
