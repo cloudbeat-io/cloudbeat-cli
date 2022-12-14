@@ -16,9 +16,9 @@ export class CloudBeatService {
     private readonly resultApi: ResultApi;
     private poolingMessages: any[] = [];
 
-    constructor({ host, apiKey }: { host?: string; apiKey: string }) {
-        this.runtimeApi = new RuntimeApi(apiKey);
-        this.resultApi = new ResultApi(apiKey);
+    constructor({ apiBaseUrl, apiKey }: { apiBaseUrl?: string; apiKey: string }) {
+        this.runtimeApi = new RuntimeApi(apiKey, apiBaseUrl);
+        this.resultApi = new ResultApi(apiKey, apiBaseUrl);
     }
 
     async runCase(caseId: string | number, options?: RunOptions) {

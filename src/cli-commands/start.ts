@@ -25,7 +25,7 @@ export default async function(testId: string, testType: string, apiKey: string, 
         helper.finishCLI(failOnErrors);
     }
     const cb = new CloudBeatService({
-        host: host,
+        apiBaseUrl: host,
         apiKey: apiKey,
     });
 
