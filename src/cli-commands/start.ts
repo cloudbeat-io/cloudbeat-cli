@@ -29,7 +29,7 @@ export default async function(testId: string, testType: string, apiKey: string, 
         apiBaseUrl: host,
         apiKey: apiKey,
     });
-    
+
     try {
         let result = null;
 

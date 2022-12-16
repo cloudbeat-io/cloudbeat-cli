@@ -27,7 +27,7 @@ program
 .command('start <testType> <testId> [folder]', { isDefault: true })
 .option('-t, --tags <tags>', 'comma separated tag list to be associated with the test result', tagsOptionParser)
 .option('--suffix [time|id]', 'report file name suffix type - must be either "time" or "id"')
-//.option('--format <format>', 'test result format for run command. Default is `junit`.');
+.option('--format [junit]', 'test result report format - currently only "junit" is supported')
 .description('start running specified type of test (case, suite or monitor) in CloudBeat')
 .action((testType, testId, folder, { tags={}, suffix=undefined }) => {
     noCommandExecuted = false;
