@@ -18,23 +18,25 @@ program
 .name('cloudbeat-cli')
 .usage('<command> [options]')
 .requiredOption('--apiKey <api-key>', 'your CloudBeat API key')
-.option('--apiBaseUrl <base-url>', 'URL to privately hosted CloudBeat instance')
+.option('--apiBaseUrl <base-url>', 'base URL to privately hosted CloudBeat instance (e.g. your local alternative to https://api.cloudbeat.io')
 .option('-f, --failOnErrors <fail-on-errors>', 'controls whether to return non-successful exit code on errors or not')
 .option('-d, --debug <debug>', 'print debug information during execution');
-// .option('-f, --format <format>', 'test result format for run command. Default is `junit`.');
 
 // start command
 program
 .command('start <testType> <testId> [folder]', { isDefault: true })
 .option('-t, --tags <tags>', 'comma separated tag list to be associated with the test result', tagsOptionParser)
+.option('--suffix [time|id]', 'report file name suffix type - must be either "time" or "id"')
+//.option('--format <format>', 'test result format for run command. Default is `junit`.');
 .description('start running specified type of test (case, suite or monitor) in CloudBeat')
-.action((testType, testId, folder, { tags={} }) => {
+.action((testType, testId, folder, { tags={}, suffix=undefined }) => {
     noCommandExecuted = false;
     startCmd(testId, testType, program.apiKey, {
         tags,
         host: program.apiBaseUrl,
         cwd: folder,
-        format: program.format,
+        reportFormat: program.format,
+        reportFileSuffix: suffix,
         folder: folder,
         failOnErrors: program.failOnErrors,
     });

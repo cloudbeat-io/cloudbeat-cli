@@ -40,12 +40,15 @@ export class FileReporterBase extends ReporterBase {
         // create results main folder (where all the results for the current test case or test suite are stored)
         this.createFolderIfNotExists(resultsBaseFolder);
         const resultFolderPath = resultsBaseFolder;
-        let timeSuffix = '';
+        let suffix = '';
         // create timestamp-based file name for the current results if "timeSuffix" property is specified
         if (this.options.timeSuffix) {
-            timeSuffix = `-${moment().format('YYYY-MM-DD_HHmmss')}`;
+            suffix = `-${moment().format('YYYY-MM-DD_HHmmss')}`;
         }
-        return path.join(resultFolderPath, `${REPORT_FILE_NAME}${timeSuffix}${fileExtension}`);
+        else if (this.options.customSuffix) {
+            suffix = `-${this.options.customSuffix}`;
+        }
+        return path.join(resultFolderPath, `${REPORT_FILE_NAME}${suffix}${fileExtension}`);
 
     }
     createFolderIfNotExists(folderPath: string) {

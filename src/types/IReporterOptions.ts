@@ -3,4 +3,5 @@ export interface IReporterOptions {
     targetFolder: string;
     cwd?: string;
     timeSuffix?: boolean;
+    customSuffix?: string;
 }

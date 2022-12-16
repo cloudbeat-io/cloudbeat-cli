@@ -8,7 +8,8 @@ export default async function(testId: string, testType: string, apiKey: string, 
     tags = undefined,
     host = undefined,
     cwd = process.cwd(),
-    format = DEFAULTS.TEST_REPORT_FORMAT,
+    reportFormat = DEFAULTS.TEST_REPORT_FORMAT,
+    reportFileSuffix = undefined,
     folder = undefined,
     failOnErrors = true,
 }) {
@@ -28,7 +29,7 @@ export default async function(testId: string, testType: string, apiKey: string, 
         apiBaseUrl: host,
         apiKey: apiKey,
     });
-
+    
     try {
         let result = null;
 
@@ -48,6 +49,8 @@ export default async function(testId: string, testType: string, apiKey: string, 
                 method: 'saveTestRunResults',
                 targetFolder: 'results',
                 cwd: undefined,
+                timeSuffix: reportFileSuffix && reportFileSuffix === 'time',
+                customSuffix: reportFileSuffix && reportFileSuffix === 'id' ? testId : undefined,
             };
 
             if (folder) {
@@ -65,7 +68,7 @@ export default async function(testId: string, testType: string, apiKey: string, 
                 reporterOpt.cwd = cwd;
             }
 
-            const reporter = helper.getReporterInstance(format, reporterOpt);
+            const reporter = helper.getReporterInstance(reportFormat, reporterOpt);
             const reportFilePath = reporter.generate(result);
             console.log(`The report is ready: ${reportFilePath}`);
 
