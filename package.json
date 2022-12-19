@@ -15,7 +15,8 @@
     "test:unit": "jest",
     "lint": "eslint ./src --ext .ts",
     "lint:fix": "eslint ./src --ext .ts --fix",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "prepare": "husky install"
   },
   "bin": {
     "cloudbeat-cli": "./build/index.js"
@@ -34,11 +35,6 @@
     "url": "https://github.com/oxygenhq/cloudbeat-cli/issues"
   },
   "homepage": "https://github.com/oxygenhq/cloudbeat-cli#readme",
-  "husky": {
-    "hooks": {
-      "pre-commit": "npm run lint"
-    }
-  },
   "dependencies": {
     "axios": "0.27.2",
     "colors": "1.4.0",
