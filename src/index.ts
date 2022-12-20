@@ -14,11 +14,11 @@ let noCommandExecuted = true;
 
 // general
 program
-.description(`CloudBeat CLI service v${  version}`)
+.description(`CloudBeat CLI service v${version}`)
 .name('cloudbeat-cli')
 .usage('<command> [options]')
 .requiredOption('--apiKey <api-key>', 'your CloudBeat API key')
-.option('--apiBaseUrl <base-url>', 'base URL to privately hosted CloudBeat instance (e.g. your local alternative to https://api.cloudbeat.io')
+.requiredOption('--apiBaseUrl <base-url>', 'API URL to privately hosted CloudBeat instance (e.g. your local alternative to https://api.cloudbeat.io')
 .option('-f, --failOnErrors <fail-on-errors>', 'controls whether to return non-successful exit code on errors or not')
 .option('-d, --debug <debug>', 'print debug information during execution');
 
@@ -28,7 +28,7 @@ program
 .option('-t, --tags <tags>', 'comma separated tag list to be associated with the test result', tagsOptionParser)
 .option('--suffix [time|id]', 'report file name suffix type - must be either "time" or "id"')
 .option('--format [junit]', 'test result report format - currently only "junit" is supported')
-.description('start running specified type of test (case, suite or monitor) in CloudBeat')
+.description('start running specified type of test (case or suite) in CloudBeat')
 .action((testType, testId, folder, { tags={}, suffix=undefined }) => {
     noCommandExecuted = false;
     startCmd(testId, testType, program.apiKey, {
