@@ -34,7 +34,6 @@ export class CloudBeatService {
     }
     async runSuite(suiteId: string | number, options?: RunOptions) {
         console.log(`Trying to run suite: ${suiteId}`);
-
         const newRunId = await this.runtimeApi.runTestSuite(suiteId as number, options);
         if (!newRunId) {
             throw new Error(`Unable to start a new run for suite: ${suiteId}`);
@@ -67,8 +66,6 @@ export class CloudBeatService {
         else {
             msg += RunStatusEnum[runStatus.status];
         }
-
-        console.log(msg);
     }
 
     async getRunResult(runId: string) {
@@ -105,7 +102,6 @@ export class CloudBeatService {
             }
             else {
                 this.poolingMessages.push(msg);
-                console.log(msg);
             }
 
         }

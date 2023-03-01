@@ -18,7 +18,7 @@ program
 .name('cloudbeat-cli')
 .usage('<command> [options]')
 .requiredOption('--apiKey <api-key>', 'your CloudBeat API key')
-.requiredOption('--apiBaseUrl <base-url>', 'API URL to privately hosted CloudBeat instance (e.g. your local alternative to https://api.cloudbeat.io')
+.option('--apiBaseUrl <base-url>', 'API URL to privately hosted CloudBeat instance (e.g. your local alternative to https://api.cloudbeat.io')
 .option('-f, --failOnErrors <fail-on-errors>', 'controls whether to return non-successful exit code on errors or not')
 .option('-d, --debug <debug>', 'print debug information during execution');
 
