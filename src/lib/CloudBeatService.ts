@@ -14,7 +14,6 @@ const statuses = {
 export class CloudBeatService {
     private readonly runtimeApi: RuntimeApi;
     private readonly resultApi: ResultApi;
-    private poolingMessages: any[] = [];
 
     constructor({ apiBaseUrl, apiKey }: { apiBaseUrl?: string; apiKey: string }) {
         this.runtimeApi = new RuntimeApi(apiKey, apiBaseUrl);
@@ -34,6 +33,7 @@ export class CloudBeatService {
     }
     async runSuite(suiteId: string | number, options?: RunOptions) {
         console.log(`Trying to run suite: ${suiteId}`);
+
         const newRunId = await this.runtimeApi.runTestSuite(suiteId as number, options);
         if (!newRunId) {
             throw new Error(`Unable to start a new run for suite: ${suiteId}`);
@@ -66,6 +66,8 @@ export class CloudBeatService {
         else {
             msg += RunStatusEnum[runStatus.status];
         }
+
+        console.log(msg);
     }
 
     async getRunResult(runId: string) {
@@ -97,13 +99,7 @@ export class CloudBeatService {
                 msg = RunStatusEnum[runStatus.status];
             }
 
-            if (this.poolingMessages.includes(msg)) {
-                // ignore
-            }
-            else {
-                this.poolingMessages.push(msg);
-            }
-
+            console.log(msg);
         }
         else if (runStatus.status === RunStatusEnum.Finished) {
             console.log(`Test with run id ${runId} has been completed`);
@@ -116,7 +112,6 @@ export class CloudBeatService {
     }
 
     async _waitForRunToFinish(runId: string) {
-        this.poolingMessages = [];
         let intervalId;
         await new Promise((resolve: any) => {
             intervalId = setInterval(() => {
