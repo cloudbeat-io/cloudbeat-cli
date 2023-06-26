@@ -16,7 +16,7 @@ Arguments:
 * `testId` - Test id.
 * `testType` - Either `case` or `suite`.
 * `apiKey` - API key. Can be retrieved from the user profile in CloudBeat.
-* `apiUrl` - CloudBeat API address. E.g. https://api.cloudbeat.io.
+* `apiUrl` - CloudBeat API address. For SaaS it should be https://api.cloudbeat.io. For on-premises installations consult your system administrator.
 * `folder` - Optional path to a directory where test results will be saved. If not specified, results will be saved in the current working directory.
 
 Usage example:
