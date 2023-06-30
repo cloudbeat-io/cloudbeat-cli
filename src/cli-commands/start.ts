@@ -12,6 +12,10 @@ export default async function(testId: string, testType: string, apiKey: string, 
     reportFileSuffix = undefined,
     folder = undefined,
     failOnErrors = true,
+    releaseName = undefined,
+    buildName = undefined,
+    environmentId = undefined,
+    environmentName = undefined,
 }) {
     if (!testId) {
         console.error('"testId" argument must be specified.');
@@ -29,18 +33,25 @@ export default async function(testId: string, testType: string, apiKey: string, 
         apiBaseUrl: host,
         apiKey: apiKey,
     });
+    const runOpts = {
+        testAttributes: tags,
+        environmentName,
+        environmentId,
+        releaseName,
+        buildName,
+    };
 
     try {
         let result = null;
 
         if (testType === 'case') {
-            result = await cb.runCase(testId, { testAttributes: tags });
+            result = await cb.runCase(testId, runOpts);
         }
         else if (testType === 'monitor') {
-            result = await cb.runMonitor(testId, { testAttributes: tags });
+            result = await cb.runMonitor(testId, runOpts);
         }
         else {
-            result = await cb.runSuite(testId, { testAttributes: tags });
+            result = await cb.runSuite(testId, runOpts);
         }
 
         if (result) {

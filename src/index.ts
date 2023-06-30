@@ -26,10 +26,14 @@ program
 program
 .command('start <testType> <testId> [folder]', { isDefault: true })
 .option('-t, --tags <tags>', 'comma separated tag list to be associated with the test result', tagsOptionParser)
+.option('-e, --env <environmentName>', 'name of the environment to be associated with the test')
+.option('--envId <environmentId>', 'ID of the environment to be associated with the test')
+.option('--build <buildName>', 'name of the build to be associated with the test result')
+.option('--release <releaseName>', 'name of the release or version to be associated with the test result')
 .option('--suffix [time|id]', 'report file name suffix type - must be either "time" or "id"')
 .option('--format [junit]', 'test result report format - currently only "junit" is supported')
 .description('start running specified type of test (case or suite) in CloudBeat')
-.action((testType, testId, folder, { tags={}, suffix=undefined }) => {
+.action((testType, testId, folder, { tags={}, suffix=undefined, environmentName, environmentId, buildName, releaseName }) => {
     noCommandExecuted = false;
     startCmd(testId, testType, program.apiKey, {
         tags,

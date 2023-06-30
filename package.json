@@ -47,6 +47,7 @@
     "@cloudbeat/client": "1.0.0-beta.6"
   },
   "devDependencies": {
+    "mock-server": "mock-server --watch true",
     "@cloudbeat/types": "1.0.0-beta.8",
     "@types/node": "16.11.45",
     "@types/request": "2.48.8",
