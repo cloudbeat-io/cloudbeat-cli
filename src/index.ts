@@ -2,7 +2,7 @@
 
 // import program from 'commander';
 import colors from 'colors';
-import { Command } from 'commander';
+import { Command, arguments } from 'commander';
 const program = new Command();
 import runResultCmd from './cli-commands/run-result';
 import runStatusCmd from './cli-commands/run-status';
@@ -33,7 +33,7 @@ program
 .option('--suffix [time|id]', 'report file name suffix type - must be either "time" or "id"')
 .option('--format [junit]', 'test result report format - currently only "junit" is supported')
 .description('start running specified type of test (case or suite) in CloudBeat')
-.action((testType, testId, folder, { tags={}, suffix=undefined, environmentName, environmentId, buildName, releaseName }) => {
+.action((testType, testId, folder, { tags={}, suffix=undefined, env: environmentName, envId: environmentId, build: buildName, release: releaseName }) => {
     noCommandExecuted = false;
     startCmd(testId, testType, program.apiKey, {
         tags,
@@ -43,6 +43,10 @@ program
         reportFileSuffix: suffix,
         folder: folder,
         failOnErrors: program.failOnErrors,
+        environmentName,
+        environmentId: !isNaN(environmentId) ? parseInt(environmentId) : environmentId,
+        buildName,
+        releaseName,
     });
 });
 
