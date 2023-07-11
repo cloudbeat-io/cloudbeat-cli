@@ -2,7 +2,7 @@
 
 // import program from 'commander';
 import colors from 'colors';
-import { Command, arguments } from 'commander';
+import { Command } from 'commander';
 const program = new Command();
 import runResultCmd from './cli-commands/run-result';
 import runStatusCmd from './cli-commands/run-status';
@@ -44,7 +44,7 @@ program
         folder: folder,
         failOnErrors: program.failOnErrors,
         environmentName,
-        environmentId: !isNaN(environmentId) ? parseInt(environmentId) : environmentId,
+        environmentId: !isNaN(environmentId) ? parseInt(environmentId, 10) : environmentId,
         buildName,
         releaseName,
     });
