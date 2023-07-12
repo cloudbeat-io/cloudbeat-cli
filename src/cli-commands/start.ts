@@ -13,7 +13,9 @@ export default async function(testId: string, testType: string, apiKey: string, 
     folder = undefined,
     failOnErrors = true,
     releaseName = undefined,
+    sprintName = undefined,
     buildName = undefined,
+    pipelineName = undefined,
     environmentId = undefined,
     environmentName = undefined,
 }) {
@@ -38,7 +40,9 @@ export default async function(testId: string, testType: string, apiKey: string, 
         environmentName,
         environmentId,
         releaseName,
+        sprintName,
         buildName,
+        pipelineName,
     };
 
     try {
