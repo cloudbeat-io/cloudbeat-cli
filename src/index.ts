@@ -7,6 +7,7 @@ const program = new Command();
 import runResultCmd from './cli-commands/run-result';
 import runStatusCmd from './cli-commands/run-status';
 import startCmd from './cli-commands/start';
+import uploadArtifactCmd from './cli-commands/upload';
 
 const { version } = require('../package.json');
 
@@ -53,6 +54,19 @@ program
         pipelineName,
         releaseName,
         sprintName,
+    });
+});
+
+// run-status command
+program
+.command('upload <projectId> <artifactFile>', { isDefault: false })
+.description('upload specified project artifact')
+.action((projectId, artifactFile) => {
+    noCommandExecuted = false;
+    uploadArtifactCmd(projectId, artifactFile, program.apiKey, {
+        host: program.apiBaseUrl,
+        debug: program.debug,
+        failOnErrors: program.failOnErrors,
     });
 });
 

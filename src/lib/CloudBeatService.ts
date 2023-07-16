@@ -1,4 +1,4 @@
-import { ResultApi, RunOptions, RuntimeApi } from '@cloudbeat/client/v1';
+import { ProjectApi, ResultApi, RunOptions, RuntimeApi } from '@cloudbeat/client/v1';
 import { RunStatus, RunStatusEnum } from '@cloudbeat/types';
 
 const RUN_POOLING_INTERVAL = 5000;
@@ -14,10 +14,12 @@ const statuses = {
 export class CloudBeatService {
     private readonly runtimeApi: RuntimeApi;
     private readonly resultApi: ResultApi;
+    private readonly projectApi: ProjectApi;
 
     constructor({ apiBaseUrl, apiKey }: { apiBaseUrl?: string; apiKey: string }) {
         this.runtimeApi = new RuntimeApi(apiKey, apiBaseUrl);
         this.resultApi = new ResultApi(apiKey, apiBaseUrl);
+        this.projectApi = new ProjectApi(apiKey, apiBaseUrl);
     }
 
     async runCase(caseId: string | number, options?: RunOptions) {
@@ -72,6 +74,15 @@ export class CloudBeatService {
 
     async getRunResult(runId: string) {
         const result = await this.resultApi.getResultByRunId(runId);
+        if (result) {
+            const json = JSON.stringify(result, null, 4);
+            console.log(`Run result:\n${json}`);
+        }
+        return result;
+    }
+
+    async uploadArtifact(projectId: string, artifactFilePath: string) {
+        const result = await this.projectApi.uploadArtifact(projectId, artifactFilePath);
         if (result) {
             const json = JSON.stringify(result, null, 4);
             console.log(`Run result:\n${json}`);
