@@ -30,11 +30,11 @@ program
 .option('--envId <environmentId>', 'ID of the environment to be associated with the test')
 .option('--build <buildName>', 'name of the build to be associated with the test result')
 .option('--release <releaseName>', 'name of the release or version to be associated with the test result')
-.option('--pipeline <pipelineName>', 'name of the current pipeline to be associated with the test result')
-.option('--sprint <sprintName>', 'name of the current sprint to be associated with the test result')
+// .option('--pipeline <pipelineName>', 'name of the current pipeline to be associated with the test result')
+// .option('--sprint <sprintName>', 'name of the current sprint to be associated with the test result')
 .option('--suffix [time|id]', 'report file name suffix type - must be either "time" or "id"')
 .option('--format [junit]', 'test result report format - currently only "junit" is supported')
-.description('start running specified type of test (case or suite) in CloudBeat')
+.description('launch the specified type of test (case or suite) in CloudBeat')
 .action((testType, testId, folder,
     { tags={}, suffix=undefined, env: environmentName, envId: environmentId, build: buildName, release: releaseName, pipeline: pipelineName, sprint: sprintName },
  ) => {
