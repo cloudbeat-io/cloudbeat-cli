@@ -25,7 +25,7 @@ program
 // start command
 program
 .command('start <testType> <testId> [folder]', { isDefault: true })
-.option('-t, --tags <tags>', 'comma separated tag list to be associated with the test result', tagsOptionParser)
+.option('-a, --attr <attributes>', 'list of comma separated name-value pairs to be passed to the test script', tagsOptionParser)
 .option('-e, --env <environmentName>', 'name of the environment to be associated with the test')
 .option('--envId <environmentId>', 'ID of the environment to be associated with the test')
 .option('--build <buildName>', 'name of the build to be associated with the test result')

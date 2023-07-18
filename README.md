@@ -23,7 +23,7 @@ If test execution succeeds exit code will be 0. Otherwise exit code will be 1.
 **Options**:
 
 * `-e, --env <name>` - Speicifies environment to use for test execution. Environment should be already defined in CloudBeat for the project whose test is being executed. 
-* `t, --tags <name=value>` - Allows passing name-value pairs to test execution scripts. The passed data can be accessed via `attributes` property. E.g. `log.info(attributes)`.
+* `-a, --attr <attributes>` - Allows passing name-value pairs to test execution scripts. The passed data can be accessed via `attributes` property. E.g. `log.info(attributes)`.
 * `--release <releaseName>` - Name of the release or version to be associated with the test result.
 * `--build <buildName>` - Name of the build to be associated with the test result.
 * `--suffix <time|id>` - Report filename suffix to use. Must be either "time" or "id".
@@ -31,7 +31,7 @@ If test execution succeeds exit code will be 0. Otherwise exit code will be 1.
 **Usage example**:
 
 ```console
-cloudbeat-cli start case 70224 --apiKey AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEE --apiBaseUrl https://api.cloudbeat.io --env MyEnviroment --tags foo=bar,baz=qux
+cloudbeat-cli start case 70224 --apiKey AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEE --apiBaseUrl https://api.cloudbeat.io --env MyEnviroment --attr foo=bar,baz=qux
 ```
 
 ### Get current test run status:
