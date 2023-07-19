@@ -17,7 +17,7 @@ If test execution succeeds exit code will be 0. Otherwise exit code will be 1.
 * `testId` - Test id.
 * `testType` - Either `case` or `suite`.
 * `apiKey` - API key. Can be retrieved from the user profile in CloudBeat.
-* `apiUrl` - CloudBeat API address. For SaaS it should be https://api.cloudbeat.io. For on-premises installations consult your system administrator.
+* `apiBaseUrl` - CloudBeat API address. For SaaS it should be https://api.cloudbeat.io. For on-premises installations consult your system administrator.
 * `folder` - Optional path to a directory where test results will be saved. If not specified, results will be saved in the current working directory.
 
 **Options**:
