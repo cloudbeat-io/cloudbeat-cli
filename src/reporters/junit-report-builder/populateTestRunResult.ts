@@ -6,8 +6,7 @@ export function populateTestRunResult(runResult: any, builder: any) {
     }
     const testResult = runResult.result;
     const suite = builder.testSuite()
-    // .id(testResult.id)
-    .id(testResult.testSuiteId || testResult.id)
+    .id(testResult.testSuiteId || testResult.testCaseId /*when executing cases, suiteId wiill be null so write caseId instead*/)
     .name(testResult.testName)
     .time(formatTime(testResult.duration));
 
