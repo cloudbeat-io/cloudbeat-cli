@@ -25,6 +25,7 @@ program
 // start command
 program
 .command('start <testType> <testId> [folder]', { isDefault: true })
+.option('--project <projectName>', 'if project name is specified, then \'testId\' should specify case/suite name instead of an id')
 .option('-a, --attr <attributes>', 'list of comma separated name-value pairs to be passed to the test script', tagsOptionParser)
 .option('-e, --env <environmentName>', 'name of the environment to be associated with the test')
 .option('--envId <environmentId>', 'ID of the environment to be associated with the test')
@@ -36,7 +37,7 @@ program
 .option('--format <junit>', 'test result report format - currently only "junit" is supported')
 .description('launch the specified type of test (case or suite) in CloudBeat')
 .action((testType, testId, folder,
-    { tags={}, suffix=undefined, env: environmentName, envId: environmentId, build: buildName, release: releaseName, pipeline: pipelineName, sprint: sprintName },
+    { tags={}, suffix=undefined, project: projectName, env: environmentName, envId: environmentId, build: buildName, release: releaseName, pipeline: pipelineName, sprint: sprintName },
  ) => {
     noCommandExecuted = false;
     startCmd(testId, testType, program.apiKey, {
@@ -53,6 +54,7 @@ program
         pipelineName,
         releaseName,
         sprintName,
+        projectName,
     });
 });
 

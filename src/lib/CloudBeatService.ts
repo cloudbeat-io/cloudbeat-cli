@@ -20,23 +20,25 @@ export class CloudBeatService {
         this.resultApi = new ResultApi(apiKey, apiBaseUrl);
     }
 
-    async runCase(caseId: string | number, options?: RunOptions) {
-        console.log(`Trying to run case: ${caseId}`);
+    async runCase(caseId: number, options?: RunOptions) {
+        const caze = caseId === 0 && options?.testName ? options.testName : caseId;
+        console.log(`Trying to run case: ${caze}`);
 
-        const newRunId = await this.runtimeApi.runTestCase(caseId as number, options);
+        const newRunId = await this.runtimeApi.runTestCase(caseId, options);
         if (!newRunId) {
-            throw new Error(`Unable to start a new run for case: ${caseId}`);
+            throw new Error(`Unable to start a new run for case: ${caze}`);
         }
         await this._waitForRunToFinish(newRunId);
         const result = await this.resultApi.getResultByRunId(newRunId);
         return result;
     }
-    async runSuite(suiteId: string | number, options?: RunOptions) {
-        console.log(`Trying to run suite: ${suiteId}`);
+    async runSuite(suiteId: number, options?: RunOptions) {
+        const suite = suiteId === 0 && options?.testName ? options.testName : suiteId;
+        console.log(`Trying to run suite: ${suite}`);
 
-        const newRunId = await this.runtimeApi.runTestSuite(suiteId as number, options);
+        const newRunId = await this.runtimeApi.runTestSuite(suiteId, options);
         if (!newRunId) {
-            throw new Error(`Unable to start a new run for suite: ${suiteId}`);
+            throw new Error(`Unable to start a new run for suite: ${suite}`);
         }
         await this._waitForRunToFinish(newRunId);
         const result = await this.resultApi.getResultByRunId(newRunId);

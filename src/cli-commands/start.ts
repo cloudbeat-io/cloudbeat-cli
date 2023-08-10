@@ -4,10 +4,11 @@ import * as DEFAULTS from '../lib/const/defaults';
 import * as helper from '../lib/helper';
 import { IReporterOptions } from '../types/IReporterOptions';
 
-export default async function(testId: string, testType: string, apiKey: string, {
+export default async function(testId: number | string, testType: string, apiKey: string, {
     tags = undefined,
     host = undefined,
     cwd = process.cwd(),
+    projectName = undefined,
     reportFormat = DEFAULTS.TEST_REPORT_FORMAT,
     reportFileSuffix = undefined,
     folder = undefined,
@@ -43,19 +44,27 @@ export default async function(testId: string, testType: string, apiKey: string, 
         sprintName,
         buildName,
         pipelineName,
+        testName: projectName ? testId as string : undefined,
+        projectName,
     };
+
+    // if project name is specified then user wants to execute case/suite by its name
+    // and we should pass 0 for the id
+    if (projectName) {
+        testId = 0;
+    }
 
     try {
         let result = null;
 
         if (testType === 'case') {
-            result = await cb.runCase(testId, runOpts);
+            result = await cb.runCase(testId as number, runOpts);
         }
         else if (testType === 'monitor') {
-            result = await cb.runMonitor(testId, runOpts);
+            result = await cb.runMonitor(testId as string, runOpts);
         }
         else {
-            result = await cb.runSuite(testId, runOpts);
+            result = await cb.runSuite(testId as number, runOpts);
         }
 
         if (result) {
@@ -65,7 +74,7 @@ export default async function(testId: string, testType: string, apiKey: string, 
                 targetFolder: 'results',
                 cwd: undefined,
                 timeSuffix: reportFileSuffix && reportFileSuffix === 'time',
-                customSuffix: reportFileSuffix && reportFileSuffix === 'id' ? testId : undefined,
+                customSuffix: reportFileSuffix && reportFileSuffix === 'id' ? testId as string : undefined,
             };
 
             if (folder) {

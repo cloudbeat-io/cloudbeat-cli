@@ -22,7 +22,8 @@ If test execution succeeds exit code will be 0. Otherwise exit code will be 1.
 
 **Options**:
 
-* `-e, --env <name>` - Speicifies environment to use for test execution. Environment should be already defined in CloudBeat for the project whose test is being executed. 
+* `-project <projectName>` - Project name. If specified, then `<testId>` should specify case/suite name instead of an id.
+* `-e, --env <name>` - Specifies environment to use for test execution. Environment should be already defined in CloudBeat for the project whose test is being executed. 
 * `-a, --attr <attributes>` - Allows passing name-value pairs to test execution scripts. The passed data can be accessed via `attributes` property. E.g. `log.info(attributes)`.
 * `--release <releaseName>` - Name of the release or version to be associated with the test result.
 * `--build <buildName>` - Name of the build to be associated with the test result.
