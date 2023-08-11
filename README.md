@@ -8,7 +8,7 @@
 ### Execute a test case or suite:
 Following command will execute the specified Case or Suite, wait for the tests to finish, and will produce XML report in JUnit format: 
 ```console
-cloudbeat-cli start <testType> <testId> --apiKey <apiKey> --apiBaseUrl <apiUrl> [options] [folder]
+cloudbeat-cli start <testType> <testId> --apiKey <apiKey> --apiBaseUrl <apiUrl> [options]
 ```  
 If test execution succeeds exit code will be 0. Otherwise exit code will be 1.
 
@@ -18,7 +18,6 @@ If test execution succeeds exit code will be 0. Otherwise exit code will be 1.
 * `testType` - Either `case` or `suite`.
 * `apiKey` - API key. Can be retrieved from the user profile in CloudBeat.
 * `apiBaseUrl` - CloudBeat API address. For SaaS it should be https://api.cloudbeat.io. For on-premises installations consult your system administrator.
-* `folder` - Optional path to a directory where test results will be saved. If not specified, results will be saved in the current working directory.
 
 **Options**:
 
@@ -28,6 +27,7 @@ If test execution succeeds exit code will be 0. Otherwise exit code will be 1.
 * `--release <releaseName>` - Name of the release or version to be associated with the test result.
 * `--build <buildName>` - Name of the build to be associated with the test result.
 * `--suffix <time|id>` - Report filename suffix to use. Must be either "time" or "id".
+* `--folder <folder>` - Path to a directory where test results will be saved. If not specified, results will be saved in the current working directory.	
 
 **Usage example**:
 
