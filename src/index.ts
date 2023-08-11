@@ -147,7 +147,10 @@ function attrOptionParser(optionValue: string) {
 }
 
 function tagsOptionParser(optionValue: string) {
-    const tags = optionValue.split(',');
+    let tags = optionValue.split(',');
+    // trim any whitespace
+    tags = tags.map(tag => tag.trim());
+    // return only distinct
     const distinctTags = [...new Set(tags)];
     return distinctTags;
 }
