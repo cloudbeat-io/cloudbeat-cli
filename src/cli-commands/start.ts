@@ -5,6 +5,7 @@ import * as helper from '../lib/helper';
 import { IReporterOptions } from '../types/IReporterOptions';
 
 export default async function(testId: number | string, testType: string, apiKey: string, {
+    tags = undefined,
     attr = undefined,
     host = undefined,
     cwd = process.cwd(),
@@ -38,6 +39,7 @@ export default async function(testId: number | string, testType: string, apiKey:
     });
     const runOpts = {
         testAttributes: attr,
+        tags,
         environmentName,
         environmentId,
         releaseName,

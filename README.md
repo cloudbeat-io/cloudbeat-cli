@@ -21,7 +21,8 @@ If test execution succeeds exit code will be 0. Otherwise exit code will be 1.
 
 **Options**:
 
-* `-project <projectName>` - Project name. If specified, then `<testId>` should specify case/suite name instead of an id.
+* `--project <projectName>` - Project name. If specified, then `<testId>` should specify case/suite name instead of an id.
+* `--tags <tags>` - Specifies tags by which the tests will be executed. Will work only with Suite.
 * `-e, --env <name>` - Specifies environment to use for test execution. Environment should be already defined in CloudBeat for the project whose test is being executed. 
 * `-a, --attr <attributes>` - Allows passing name-value pairs to test execution scripts. The passed data can be accessed via `attributes` property. E.g. `log.info(attributes)`.
 * `--release <releaseName>` - Name of the release or version to be associated with the test result.
@@ -29,10 +30,24 @@ If test execution succeeds exit code will be 0. Otherwise exit code will be 1.
 * `--suffix <time|id>` - Report filename suffix to use. Must be either "time" or "id".
 * `--folder <folder>` - Path to a directory where test results will be saved. If not specified, results will be saved in the current working directory.	
 
-**Usage example**:
+**Usage examples**:
+
+Execute Case by its id and pass environment id and test attributes:
 
 ```console
 cloudbeat-cli start case 70224 --apiKey AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEE --apiBaseUrl https://api.cloudbeat.io --env MyEnviroment --attr foo=bar,baz=qux
+```
+
+Execute Case by its name. Note that when executing tests by name, project name should be specified as well:
+
+```console
+cloudbeat-cli start case "My Case" --project "My Project" --apiKey AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEE --apiBaseUrl https://api.cloudbeat.io
+```
+
+Execute tests marked with the specified tags in the specified suite. This will override any tags selected via CloudBeat UI:
+
+```console
+cloudbeat-cli start suite 34984 --tags foo,bar,qaz --apiKey AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEE --apiBaseUrl https://api.cloudbeat.io
 ```
 
 ### Get current test run status:

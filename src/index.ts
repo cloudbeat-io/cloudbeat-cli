@@ -26,6 +26,7 @@ program
 program
 .command('start <testType> <testId>', { isDefault: true })
 .option('--project <projectName>', 'if project name is specified, then \'testId\' should specify case/suite name instead of an id')
+.option('--tags <tags>', 'list of comma separated Suite tags to execute', tagsOptionParser)
 .option('-a, --attr <attributes>', 'list of comma separated name-value pairs to be passed to the test script', attrOptionParser)
 .option('-e, --env <environmentName>', 'name of the environment to be associated with the test')
 .option('--envId <environmentId>', 'ID of the environment to be associated with the test')
@@ -40,6 +41,7 @@ program
 .action((testType, testId,
     {
         attr={},
+        tags={},
         suffix=undefined,
         project: projectName,
         env: environmentName,
@@ -54,6 +56,7 @@ program
     noCommandExecuted = false;
     startCmd(testId, testType, program.apiKey, {
         attr,
+        tags,
         host: program.apiBaseUrl,
         cwd: folder,
         reportFormat: program.format,
@@ -142,4 +145,9 @@ function attrOptionParser(optionValue: string) {
     });
     return attrsHash;
 }
+
+function tagsOptionParser(optionValue: string) {
+    const tags = optionValue.split(',');
+    const distinctTags = [...new Set(tags)];
+    return distinctTags;
 }
