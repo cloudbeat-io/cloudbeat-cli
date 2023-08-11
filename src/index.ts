@@ -26,7 +26,7 @@ program
 program
 .command('start <testType> <testId>', { isDefault: true })
 .option('--project <projectName>', 'if project name is specified, then \'testId\' should specify case/suite name instead of an id')
-.option('-a, --attr <attributes>', 'list of comma separated name-value pairs to be passed to the test script', tagsOptionParser)
+.option('-a, --attr <attributes>', 'list of comma separated name-value pairs to be passed to the test script', attrOptionParser)
 .option('-e, --env <environmentName>', 'name of the environment to be associated with the test')
 .option('--envId <environmentId>', 'ID of the environment to be associated with the test')
 .option('--build <buildName>', 'name of the build to be associated with the test result')
@@ -39,7 +39,7 @@ program
 .description('launch the specified type of test (case or suite) in CloudBeat')
 .action((testType, testId,
     {
-        tags={},
+        attr={},
         suffix=undefined,
         project: projectName,
         env: environmentName,
@@ -53,7 +53,7 @@ program
  ) => {
     noCommandExecuted = false;
     startCmd(testId, testType, program.apiKey, {
-        tags,
+        attr,
         host: program.apiBaseUrl,
         cwd: folder,
         reportFormat: program.format,
@@ -120,25 +120,26 @@ process.on('warning', (warning) => {
     console.warn(warning.stack);
 });
 
-function tagsOptionParser(optionValue: string) {
-    const tagsListNameValueAsString = optionValue.split(',');
-    const tagsHash: {[key: string]: string | string[]} = {};
-    tagsListNameValueAsString.forEach((tagNameValueStr: string) => {
-        if (tagNameValueStr.indexOf('=')) {
-            const [ tagName, tagValue ] = tagNameValueStr.split('=');
-            // if tag with this name already exists, add different values to the same tags in form of Array
-            if (tagsHash[tagName]) {
-                if (Array.isArray(tagsHash[tagName])) {
-                    (tagsHash[tagName] as string[]).push(tagValue);
+function attrOptionParser(optionValue: string) {
+    const attrsListNameValueAsString = optionValue.split(',');
+    const attrsHash: {[key: string]: string | string[]} = {};
+    attrsListNameValueAsString.forEach((attrNameValueStr: string) => {
+        if (attrNameValueStr.indexOf('=')) {
+            const [ attrName, attrValue ] = attrNameValueStr.split('=');
+            // if attr with this name already exists, add different values to the same attrs in form of Array
+            if (attrsHash[attrName]) {
+                if (Array.isArray(attrsHash[attrName])) {
+                    (attrsHash[attrName] as string[]).push(attrValue);
                 }
                 else {
-                    tagsHash[tagName] = [tagsHash[tagName] as string, tagValue];
+                    attrsHash[attrName] = [attrsHash[attrName] as string, attrValue];
                 }
             }
             else {
-                tagsHash[tagName] = tagValue;
+                attrsHash[attrName] = attrValue;
             }
         }
     });
-    return tagsHash;
+    return attrsHash;
+}
 }
