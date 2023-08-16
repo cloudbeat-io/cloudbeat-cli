@@ -41,7 +41,7 @@ program
 .action((testType, testId,
     {
         attr={},
-        tags={},
+        tags=undefined,
         suffix=undefined,
         project: projectName,
         env: environmentName,
