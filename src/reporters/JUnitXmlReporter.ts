@@ -30,8 +30,8 @@ export default class JUnitXmlReporter extends FileReporterBase {
 
         if(method === 'saveTestRunResults'){
             const builder = new Factory().newBuilder();
-
-            populateTestRunResult(result, builder);
+            const casesTagsHash = this.getCasesTagsHash();
+            populateTestRunResult(result, builder, casesTagsHash);
 
             builder.writeTo(resultFilePath);
 

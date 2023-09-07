@@ -30,7 +30,8 @@ export class CloudBeatService {
         }
         await this._waitForRunToFinish(newRunId);
         const result = await this.resultApi.getResultByRunId(newRunId);
-        return result;
+        const caseTagList = await this.resultApi.getResultTestCasesTagsByRunId(newRunId);
+        return { result, caseTagList };
     }
     async runSuite(suiteId: number, options?: RunOptions) {
         const suite = suiteId === 0 && options?.testName ? options.testName : suiteId;
@@ -42,7 +43,8 @@ export class CloudBeatService {
         }
         await this._waitForRunToFinish(newRunId);
         const result = await this.resultApi.getResultByRunId(newRunId);
-        return result;
+        const caseTagList = await this.resultApi.getResultTestCasesTagsByRunId(newRunId);
+        return { result, caseTagList };
     }
     async runMonitor(monitorId: string, options?: RunOptions) {
         console.log(`Trying to run monitor: ${monitorId}`);
@@ -53,7 +55,8 @@ export class CloudBeatService {
         }
         await this._waitForRunToFinish(newRunId);
         const result = await this.resultApi.getResultByRunId(newRunId);
-        return result;
+        const caseTagList = await this.resultApi.getResultTestCasesTagsByRunId(newRunId);
+        return { result, caseTagList: null };
     }
     getResult(resultId: string) {
 

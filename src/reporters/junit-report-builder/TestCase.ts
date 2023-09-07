@@ -10,6 +10,7 @@ export class TestCase {
     private _failureAttributes: any = {};
     private _errorAttachment?: any = undefined;
     private _errorContent?: string = undefined;
+    private _properties: any = [];
 
     public className(className: string) {
         this._attributes.classname = className;
@@ -73,6 +74,11 @@ export class TestCase {
         return this;
     }
 
+    property(name: string, value: any) {
+        this._properties.push({ name, value });
+        return this;
+    }
+
     skipped() {
         this._skipped = true;
     }
@@ -103,6 +109,16 @@ export class TestCase {
 
     build(parentElement: any) {
         const testCaseElement = parentElement.ele('testcase', this._attributes);
+        // add <properties> child element
+        if (this._properties.length) {
+            const propertiesElement = testCaseElement.ele('properties');
+            for (const property of this._properties) {
+              propertiesElement.ele('property', {
+                name: property.name,
+                value: property.value,
+              });
+            }
+        }
         if (this._failure) {
             const failureElement = testCaseElement.ele('failure', this._failureAttributes);
             if (this._stacktrace) {

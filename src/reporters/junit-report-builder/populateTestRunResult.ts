@@ -1,6 +1,6 @@
 const DISPLAY_NAME_SEPARATOR = '/';
 
-export function populateTestRunResult(runResult: any, builder: any) {
+export function populateTestRunResult(runResult: any, builder: any, caseTagsHash: any) {
     if (!runResult) {
         throw new Error('"runResult" is null or undefined');
     }
@@ -16,6 +16,8 @@ export function populateTestRunResult(runResult: any, builder: any) {
             if (Array.isArray(testInstance.iterationList) && testInstance.iterationList.length > 0) {
                 testInstance.iterationList.forEach((caseIteration: any, iterationIndex: number) => {
                     const { caseId, caseName, fqn, status, failure, stepList } = caseIteration;
+                    const caseTags = caseTagsHash[caseId || fqn];
+                    const jiraOrXrayTags = getJiraOrXrayTags(caseTags);
                     const duration = calculateDurationBySteps(stepList);
                     const displayName = getCaseDisplayName(caseName, locationName, browserName, deviceName);
                     const isFailed = status === 'FAILED';
@@ -27,6 +29,10 @@ export function populateTestRunResult(runResult: any, builder: any) {
                         .time(formatTime(duration));
                     if (isFailed) {
                         testCase.failure(getFailureMessage(failure || getFailureFromSteps(stepList), runResult.result.id, runResult.domain));
+                    }
+                    // if there is a Jira or Xray tag defined, add special "test_key" extended property readable by Xray
+                    if (jiraOrXrayTags && jiraOrXrayTags.length) {
+                        testCase.property('test_key', jiraOrXrayTags[0]);
                     }
                 });
             }
@@ -47,6 +53,19 @@ export function populateTestRunResult(runResult: any, builder: any) {
             }
         });
     }
+}
+
+function getJiraOrXrayTags(allTags: any[]): string[] {
+    if (!allTags || !Array.isArray(allTags)) {
+        return [];
+    }
+    const filteredTags: string[] = [];
+    allTags.forEach(tag => {
+        if (tag.length && tag.toLowerCase().startsWith('jira=')) {
+            filteredTags.push(tag.substring(4));
+        }
+    });
+    return filteredTags;
 }
 
 function calculateDurationBySteps(stepList: any[]): number {

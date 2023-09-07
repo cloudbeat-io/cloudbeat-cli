@@ -58,15 +58,22 @@ export default async function(testId: number | string, testType: string, apiKey:
 
     try {
         let result = null;
+        let caseTagList = null;
 
         if (testType === 'case') {
-            result = await cb.runCase(testId as number, runOpts);
+            const { result: _result, caseTagList: _caseTagList } = await cb.runCase(testId as number, runOpts);
+            result = _result;
+            caseTagList = _caseTagList;
         }
         else if (testType === 'monitor') {
-            result = await cb.runMonitor(testId as string, runOpts);
+            const { result: _result, caseTagList: _caseTagList } = await cb.runMonitor(testId as string, runOpts);
+            result = _result;
+            caseTagList = _caseTagList;
         }
         else {
-            result = await cb.runSuite(testId as number, runOpts);
+            const { result: _result, caseTagList: _caseTagList } = await cb.runSuite(testId as number, runOpts);
+            result = _result;
+            caseTagList = _caseTagList;
         }
 
         if (result) {
@@ -77,6 +84,7 @@ export default async function(testId: number | string, testType: string, apiKey:
                 cwd: undefined,
                 timeSuffix: reportFileSuffix && reportFileSuffix === 'time',
                 customSuffix: reportFileSuffix && reportFileSuffix === 'id' ? testId as string : undefined,
+                caseTagList: caseTagList,
             };
 
             if (folder) {

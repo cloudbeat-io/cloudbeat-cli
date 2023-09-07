@@ -4,4 +4,6 @@ export interface IReporterOptions {
     cwd?: string;
     timeSuffix?: boolean;
     customSuffix?: string;
+    tags?: string[];
+    caseTagList?: any[];
 }

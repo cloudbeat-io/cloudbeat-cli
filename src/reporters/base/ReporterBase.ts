@@ -20,4 +20,19 @@ export class ReporterBase {
     generate(results: any) {
         throw new Error('Abstract class, method not implemented');
     }
+
+    protected getCasesTagsHash(): any {
+        if (!this.options.caseTagList || !Array.isArray(this.options.caseTagList)) {
+            return {};
+        }
+        const caseIdAndTagsHash: any = {};
+        for (const caseTagList of this.options.caseTagList) {
+            const caseIdOrFqn: any | undefined = caseTagList.caseId || caseTagList.fqn;
+            if (!caseIdOrFqn) {
+                continue;
+            }
+            caseIdAndTagsHash[caseIdOrFqn] = caseTagList.tags;
+        }
+        return caseIdAndTagsHash;
+    }
 }
