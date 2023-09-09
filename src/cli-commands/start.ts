@@ -58,7 +58,8 @@ export default async function(testId: number | string, testType: string, apiKey:
 
     try {
         let result = null;
-        let caseTagList = null;
+        // eslint-disable-next-line no-undef-init
+        let caseTagList = undefined;
 
         if (testType === 'case') {
             const { result: _result, caseTagList: _caseTagList } = await cb.runCase(testId as number, runOpts);
@@ -84,7 +85,7 @@ export default async function(testId: number | string, testType: string, apiKey:
                 cwd: undefined,
                 timeSuffix: reportFileSuffix && reportFileSuffix === 'time',
                 customSuffix: reportFileSuffix && reportFileSuffix === 'id' ? testId as string : undefined,
-                caseTagList: caseTagList,
+                caseTagList: caseTagList as any[] | undefined,
             };
 
             if (folder) {
