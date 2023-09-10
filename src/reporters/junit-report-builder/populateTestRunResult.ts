@@ -17,7 +17,7 @@ export function populateTestRunResult(runResult: any, builder: any, caseTagsHash
                 testInstance.iterationList.forEach((caseIteration: any, iterationIndex: number) => {
                     const { caseId, caseName, fqn, status, failure, stepList } = caseIteration;
                     const caseTags = caseTagsHash[caseId || fqn];
-                    const jiraOrXrayTags = getJiraOrXrayTags(caseTags);
+                    const xrayOrJiraTag = getFirstXrayOrJiraTag(caseTags);
                     const duration = calculateDurationBySteps(stepList);
                     const displayName = getCaseDisplayName(caseName, locationName, browserName, deviceName);
                     const isFailed = status === 'FAILED';
@@ -31,8 +31,8 @@ export function populateTestRunResult(runResult: any, builder: any, caseTagsHash
                         testCase.failure(getFailureMessage(failure || getFailureFromSteps(stepList), runResult.result.id, runResult.domain));
                     }
                     // if there is a Jira or Xray tag defined, add special "test_key" extended property readable by Xray
-                    if (jiraOrXrayTags && jiraOrXrayTags.length) {
-                        testCase.property('test_key', jiraOrXrayTags[0]);
+                    if (xrayOrJiraTag) {
+                        testCase.property('test_key', xrayOrJiraTag);
                     }
                 });
             }
@@ -55,17 +55,29 @@ export function populateTestRunResult(runResult: any, builder: any, caseTagsHash
     }
 }
 
-function getJiraOrXrayTags(allTags: any[]): string[] {
+function getFirstXrayOrJiraTag(allTags: any[]): string | undefined {
+    // we need to pick one tag to pass it to the Xray (as Xray support only one test_key property)
+    // so give preference to Xray tag over Jira tag
     if (!allTags || !Array.isArray(allTags)) {
-        return [];
+        return undefined;
     }
-    const filteredTags: string[] = [];
-    allTags.forEach(tag => {
-        if (tag.length && tag.toLowerCase().startsWith('jira=')) {
-            filteredTags.push(tag.substring(4));
-        }
-    });
-    return filteredTags;
+    let xrayTag = allTags.find(tag => tag.toLowerCase().startsWith('xray='));
+    if (xrayTag) {
+        return xrayTag.substring(5);
+    }
+    xrayTag = allTags.find(tag => tag.toLowerCase().startsWith('@xray='));
+    if (xrayTag) {
+        return xrayTag.substring(6);
+    }
+    let jiraTag = allTags.find(tag => tag.toLowerCase().startsWith('jira='));
+    if (jiraTag) {
+        return jiraTag.substring(5);
+    }
+    jiraTag = allTags.find(tag => tag.toLowerCase().startsWith('@jira='));
+    if (jiraTag) {
+        return jiraTag.substring(6);
+    }
+    return undefined;
 }
 
 function calculateDurationBySteps(stepList: any[]): number {
