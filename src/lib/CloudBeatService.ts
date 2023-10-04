@@ -20,7 +20,7 @@ export class CloudBeatService {
         this.resultApi = new ResultApi(apiKey, apiBaseUrl);
     }
 
-    async runCase(caseId: number, options?: RunOptions) {
+    async runCase(caseId: number, silent: boolean, options?: RunOptions) {
         const caze = caseId === 0 && options?.testName ? options.testName : caseId;
         console.log(`Trying to run case: ${caze}`);
 
@@ -28,12 +28,12 @@ export class CloudBeatService {
         if (!newRunId) {
             throw new Error(`Unable to start a new run for case: ${caze}`);
         }
-        await this._waitForRunToFinish(newRunId);
+        await this._waitForRunToFinish(newRunId, silent);
         const result = await this.resultApi.getResultByRunId(newRunId);
         const caseTagList = await this.resultApi.getResultTestCasesTagsByRunId(newRunId);
         return { result, caseTagList };
     }
-    async runSuite(suiteId: number, options?: RunOptions) {
+    async runSuite(suiteId: number, silent: boolean, options?: RunOptions) {
         const suite = suiteId === 0 && options?.testName ? options.testName : suiteId;
         console.log(`Trying to run suite: ${suite}`);
 
@@ -41,19 +41,19 @@ export class CloudBeatService {
         if (!newRunId) {
             throw new Error(`Unable to start a new run for suite: ${suite}`);
         }
-        await this._waitForRunToFinish(newRunId);
+        await this._waitForRunToFinish(newRunId, silent);
         const result = await this.resultApi.getResultByRunId(newRunId);
         const caseTagList = await this.resultApi.getResultTestCasesTagsByRunId(newRunId);
         return { result, caseTagList };
     }
-    async runMonitor(monitorId: string, options?: RunOptions) {
+    async runMonitor(monitorId: string, silent: boolean, options?: RunOptions) {
         console.log(`Trying to run monitor: ${monitorId}`);
 
         const newRunId = await this.runtimeApi.runMonitor(monitorId, options);
         if (!newRunId) {
             throw new Error(`Unable to start a new run for monitor: ${monitorId}`);
         }
-        await this._waitForRunToFinish(newRunId);
+        await this._waitForRunToFinish(newRunId, silent);
         const result = await this.resultApi.getResultByRunId(newRunId);
         const caseTagList = await this.resultApi.getResultTestCasesTagsByRunId(newRunId);
         return { result, caseTagList: null };
@@ -82,27 +82,28 @@ export class CloudBeatService {
         return result;
     }
 
-    async handleRealPooling(runId: string, resolve: () => void){
+    async handleRealPooling(runId: string, silent: boolean, resolve: () => void){
         const runStatus: RunStatus = await this.runtimeApi.getRunStatus(runId);
         if (runStatus.status === RunStatusEnum.Pending
             || runStatus.status === RunStatusEnum.Initializing
             || runStatus.status === RunStatusEnum.Running
         ) {
-            // waiting
-            let msg;
-            if (runStatus.status === RunStatusEnum.Running) {
-                if (runStatus.progress) {
-                    msg = `${RunStatusEnum[runStatus.status]} ${(runStatus.progress * 100).toFixed(0)}%`;
+            if (!silent) {
+                let msg;
+                if (runStatus.status === RunStatusEnum.Running) {
+                    if (runStatus.progress) {
+                        msg = `${RunStatusEnum[runStatus.status]} ${(runStatus.progress * 100).toFixed(0)}%`;
+                    }
+                    else {
+                        msg = RunStatusEnum[runStatus.status];
+                    }
                 }
                 else {
                     msg = RunStatusEnum[runStatus.status];
                 }
-            }
-            else {
-                msg = RunStatusEnum[runStatus.status];
-            }
 
-            console.log(msg);
+                console.log(msg);
+            }
         }
         else if (runStatus.status === RunStatusEnum.Finished) {
             console.log(`Test with run id ${runId} has been completed`);
@@ -114,11 +115,11 @@ export class CloudBeatService {
         }
     }
 
-    async _waitForRunToFinish(runId: string) {
+    async _waitForRunToFinish(runId: string, silent: boolean) {
         let intervalId;
         await new Promise((resolve: any) => {
             intervalId = setInterval(() => {
-                this.handleRealPooling(runId, resolve);
+                this.handleRealPooling(runId, silent, resolve);
             }, RUN_POOLING_INTERVAL);
         });
         clearInterval(intervalId);

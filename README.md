@@ -28,7 +28,8 @@ If test execution succeeds exit code will be 0. Otherwise exit code will be 1.
 * `--release <releaseName>` - Name of the release or version to be associated with the test result.
 * `--build <buildName>` - Name of the build to be associated with the test result.
 * `--suffix <time|id>` - Report filename suffix to use. Must be either "time" or "id".
-* `--folder <folder>` - Path to a directory where test results will be saved. If not specified, results will be saved in the current working directory.	
+* `--folder <folder>` - Path to a directory where test results will be saved. If not specified, results will be saved in the current working directory.
+* `--silent` - Do not print test progress details.  
 
 **Usage examples**:
 

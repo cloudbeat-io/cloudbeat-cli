@@ -20,6 +20,7 @@ export default async function(testId: number | string, testType: string, apiKey:
     pipelineName = undefined,
     environmentId = undefined,
     environmentName = undefined,
+    silent = false,
 }) {
     if (!testId) {
         console.error('"testId" argument must be specified.');
@@ -62,17 +63,17 @@ export default async function(testId: number | string, testType: string, apiKey:
         let caseTagList = undefined;
 
         if (testType === 'case') {
-            const { result: _result, caseTagList: _caseTagList } = await cb.runCase(testId as number, runOpts);
+            const { result: _result, caseTagList: _caseTagList } = await cb.runCase(testId as number, silent, runOpts);
             result = _result;
             caseTagList = _caseTagList;
         }
         else if (testType === 'monitor') {
-            const { result: _result, caseTagList: _caseTagList } = await cb.runMonitor(testId as string, runOpts);
+            const { result: _result, caseTagList: _caseTagList } = await cb.runMonitor(testId as string, silent, runOpts);
             result = _result;
             caseTagList = _caseTagList;
         }
         else {
-            const { result: _result, caseTagList: _caseTagList } = await cb.runSuite(testId as number, runOpts);
+            const { result: _result, caseTagList: _caseTagList } = await cb.runSuite(testId as number, silent, runOpts);
             result = _result;
             caseTagList = _caseTagList;
         }

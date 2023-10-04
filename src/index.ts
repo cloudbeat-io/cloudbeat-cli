@@ -37,6 +37,7 @@ program
 .option('--suffix <time|id>', 'report file name suffix type - must be either "time" or "id"')
 .option('--format <junit>', 'test result report format - currently only "junit" is supported')
 .option('--folder <folder>', 'path to a directory where test results will be saved. current working directory is used by default.')
+.option('--silent', 'do not print test progress details.')
 .description('launch the specified type of test (case or suite) in CloudBeat')
 .action((testType, testId,
     {
@@ -51,6 +52,7 @@ program
         pipeline: pipelineName,
         sprint: sprintName,
         folder: folder,
+        silent: silent,
     },
  ) => {
     noCommandExecuted = false;
@@ -62,6 +64,7 @@ program
         reportFormat: program.format,
         reportFileSuffix: suffix,
         folder: folder,
+        silent: silent,
         failOnErrors: program.failOnErrors,
         environmentName,
         environmentId: !isNaN(environmentId) ? parseInt(environmentId, 10) : environmentId,
