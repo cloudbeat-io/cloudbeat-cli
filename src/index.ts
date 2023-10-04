@@ -19,8 +19,7 @@ program
 .usage('<command> [options]')
 .requiredOption('--apiKey <apiKey>', 'your CloudBeat API key')
 .requiredOption('--apiBaseUrl <apiUrl>', 'API URL for a privately hosted CloudBeat instance (e.g. your local alternative to https://api.cloudbeat.io')
-.option('-f, --failOnErrors <true|false>', 'controls whether to return non-successful exit code on errors or not')
-.option('-d, --debug <true|false>', 'print debug information during execution');
+.option('-f, --failOnErrors <true|false>', 'controls whether to return non-successful exit code on errors or not');
 
 // start command
 program
@@ -85,7 +84,6 @@ program
     runStatusCmd(runId, program.apiKey, {
         host: program.apiBaseUrl,
         failOnErrors: program.failOnErrors,
-        debug: program.debug,
     });
 });
 
@@ -97,7 +95,6 @@ program
     noCommandExecuted = false;
     runResultCmd(runId, program.apiKey, program.apiBaseUrl, {
         failOnErrors: program.failOnErrors,
-        debug: program.debug,
     });
 });
 

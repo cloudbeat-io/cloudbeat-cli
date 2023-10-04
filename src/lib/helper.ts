@@ -26,18 +26,18 @@ export const finishCLI = (failOnErrors = true, result?: any) => {
     if (failOnErrors?.toString() === 'false') {
         failOnErrors = false;
     }
- else {
+    else {
         failOnErrors = true;
     }
 
     if (failOnErrors) {
         // do nothing, all ok
     }
- else {
-        if(code === 0){
+    else {
+        if (code === 0) {
             code = 1;
         }
- else if(code === 1){
+        else if (code === 1) {
             code = 0;
         }
     }

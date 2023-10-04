@@ -66,4 +66,3 @@ cloudbeat-cli run-result <runId> --apiKey <apiKey> --apiBaseUrl <apiUrl>
 ### Additional general options (work with all commands):
 
 * `-f, --failOnErrors <true|false>` - Controls whether to return non-successful exit code on errors or not.
-* `-d, --debug <true|false>` - Print debug information during execution.

@@ -3,7 +3,6 @@ import * as helper from '../lib/helper';
 
 export default async function(runId: string, apiKey: string, host = undefined, {
     failOnErrors = false,
-    debug = false,
 }) {
     if (!runId) {
         console.error('"runId" argument must be specified.');
