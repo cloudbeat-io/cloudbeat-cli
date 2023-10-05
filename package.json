@@ -1,7 +1,7 @@
 {
   "name": "@cloudbeat/cli",
-  "version": "3.0.0",
-  "description": "CLI tool to wrap CloudBeat API",
+  "version": "3.1.0",
+  "description": "CLI for CloudBeat API",
   "main": "build/index",
   "types": "build/index",
   "scripts": {
