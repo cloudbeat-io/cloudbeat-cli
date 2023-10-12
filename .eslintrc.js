@@ -22,7 +22,6 @@ module.exports = {
       "eslint-plugin-no-null",
       "eslint-plugin-prefer-arrow",
       "eslint-plugin-import",
-      "eslint-plugin-jsdoc",
       "@typescript-eslint",
     ],
     rules: {
@@ -181,9 +180,6 @@ module.exports = {
       "import/no-default-export": "off",
       "import/no-unassigned-import": "off",
       "import/order": ["error", { alphabetize: { order: "asc", caseInsensitive: true } }],
-      "jsdoc/check-alignment": "error",
-      "jsdoc/check-indentation": "error",
-      "jsdoc/newline-after-description": "error",
       "max-classes-per-file": ["error", 5],
       // "max-len": [
       //   "error",
