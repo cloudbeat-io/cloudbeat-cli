@@ -27,7 +27,7 @@ export class ReporterBase {
         }
         const caseIdAndTagsHash: any = {};
         for (const caseTagList of this.options.caseTagList) {
-            const caseIdOrFqn: any | undefined = caseTagList.caseId || caseTagList.fqn;
+            const caseIdOrFqn: any = caseTagList.caseId || caseTagList.fqn;
             if (!caseIdOrFqn) {
                 continue;
             }

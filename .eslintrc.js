@@ -113,6 +113,7 @@ module.exports = {
       "@typescript-eslint/no-parameter-properties": "off",
       "@typescript-eslint/no-require-imports": "off",
       "@typescript-eslint/no-this-alias": "error",
+      "@typescript-eslint/no-unsafe-argument": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
       "@typescript-eslint/no-unsafe-call": "off",
