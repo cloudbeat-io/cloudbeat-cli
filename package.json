@@ -35,7 +35,7 @@
   },
   "homepage": "https://github.com/oxygenhq/cloudbeat-cli#readme",
   "dependencies": {
-    "@cloudbeat/client": "1.2.1",
+    "@cloudbeat/client": "file:../cb-kit-nodejs/packages/client",
     "axios": "0.27.2",
     "colors": "1.4.0",
     "commander": "5.1.0",

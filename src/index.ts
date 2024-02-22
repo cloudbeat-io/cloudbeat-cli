@@ -7,6 +7,7 @@ const program = new Command();
 import runResultCmd from './cli-commands/run-result';
 import runStatusCmd from './cli-commands/run-status';
 import startCmd from './cli-commands/start';
+import syncCmd from './cli-commands/sync';
 
 const { version } = require('../package.json');
 
@@ -20,6 +21,20 @@ program
 .requiredOption('--apiKey <apiKey>', 'your CloudBeat API key')
 .requiredOption('--apiBaseUrl <apiUrl>', 'API URL for a privately hosted CloudBeat instance (e.g. your local alternative to https://api.cloudbeat.io')
 .option('-f, --failOnErrors <true|false>', 'controls whether to return non-successful exit code on errors or not');
+
+// sync command
+program
+.command('sync <project> <filePath>', { isDefault: false })
+.description('upload and synchronize ZIP-based project artifacts')
+.action(
+    (
+        project,
+        filePath,
+    ) => {
+        noCommandExecuted = false;
+        syncCmd(project, filePath, program.apiKey, program.apiBaseUrl);
+    },
+);
 
 // start command
 program
