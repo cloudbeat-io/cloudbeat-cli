@@ -52,15 +52,34 @@ cloudbeat-cli start suite 34984 --tags foo,bar,qaz --apiKey AAAAAAAA-BBBB-CCCC-D
 ```
 
 ### Get current test run status:
-`run-status` can be used for getting status of a currently executing test:  
+`run-status` can be used for retrieving the status of a currently executing test:  
 ```console
 cloudbeat-cli run-status <runId> --apiKey <apiKey> --apiBaseUrl <apiUrl>
 ```
 
 ### Get test result for specified test run:
-`run-result` can be used for getting result data for a finished test:  
+`run-result` can be used for retrieving the result data for a finished test:  
 ```console
 cloudbeat-cli run-result <runId> --apiKey <apiKey> --apiBaseUrl <apiUrl>
+```
+
+### Update project artifacts:
+`sync` can be used for updating artifacts for the specified project using a zip archive.
+```console
+cloudbeat-cli sync <projectId> <artifactArchive> --apiKey <apiKey> --apiBaseUrl <apiUrl>
+```  
+
+**Arguments**:
+
+* `projectId` - Project id. Project type must support uploading artifacts as zip archives.
+* `artifactArchive` - Path to a zip archive containing the artifacts.
+* `apiKey` - API key. Can be retrieved from the user profile in CloudBeat.
+* `apiBaseUrl` - CloudBeat API address. For SaaS it should be https://api.cloudbeat.io. For on-premises installations consult your system administrator.
+
+**Usage examples**:
+
+```console
+cloudbeat-cli sync 53574 "C:\foo\bar.zip" --apiKey AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEE --apiBaseUrl https://api.cloudbeat.io
 ```
 
 ### Additional general options (work with all commands):
