@@ -95,8 +95,11 @@ export class CloudBeatService {
         }
         const fileName = path.basename(filePath);
         const fileContent = fs.readFileSync(filePath);
-        const { commitHash } = await this.projectApi.getSyncStatus(projectId) || {};
-        await this.projectApi.uploadArtifacts(projectId, fileName, fileContent);
+        const { commitHash } = await this.projectApi.getSyncStatus(projectId.toString()) || {};
+        if (!commitHash) {
+            throw new Error('Unable to obtain sync status.');
+        }
+        await this.projectApi.uploadArtifacts(projectId.toString(), fileName, fileContent);
         await this.waitForSyncStatusToChange(projectId, commitHash);
     }
 
@@ -147,7 +150,7 @@ export class CloudBeatService {
         let intervalId: any;
         await new Promise((resolve: any) => {
             intervalId = setInterval(async () => {
-                const syncStatus = await this.projectApi.getSyncStatus(projectId);
+                const syncStatus = await this.projectApi.getSyncStatus(projectId.toString());
                 if (syncStatus.commitHash !== commitHash) {
                     resolve();
                 }
