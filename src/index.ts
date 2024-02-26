@@ -19,7 +19,7 @@ program
 .name('cloudbeat-cli')
 .usage('<command> [options]')
 .requiredOption('--apiKey <apiKey>', 'your CloudBeat API key')
-.requiredOption('--apiBaseUrl <apiUrl>', 'API URL for a privately hosted CloudBeat instance (e.g. your local alternative to https://api.cloudbeat.io')
+.requiredOption('--apiBaseUrl <apiUrl>', 'API URL for a privately hosted CloudBeat instance (i.e. your local alternative to https://api.cloudbeat.io)')
 .option('-f, --failOnErrors <true|false>', 'controls whether to return non-successful exit code on errors or not');
 
 // sync command
