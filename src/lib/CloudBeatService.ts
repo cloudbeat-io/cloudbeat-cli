@@ -33,7 +33,10 @@ export class CloudBeatService {
         if (!newRunId) {
             throw new Error(`Unable to start a new run for case: ${caze}`);
         }
-        await this.waitForRunToFinish(newRunId, silent);
+        const isSuccess = await this.waitForRunToFinish(newRunId, silent);
+        if (!isSuccess) {
+            return { result: null, caseTagList: null };
+        }
         const result = await this.resultApi.getResultByRunId(newRunId);
         const caseTagList = await this.resultApi.getResultTestCasesTagsByRunId(newRunId);
         return { result, caseTagList };
@@ -46,7 +49,10 @@ export class CloudBeatService {
         if (!newRunId) {
             throw new Error(`Unable to start a new run for suite: ${suite}`);
         }
-        await this.waitForRunToFinish(newRunId, silent);
+        const isSuccess = await this.waitForRunToFinish(newRunId, silent);
+        if (!isSuccess) {
+            return { result: null, caseTagList: null };
+        }
         const result = await this.resultApi.getResultByRunId(newRunId);
         const caseTagList = await this.resultApi.getResultTestCasesTagsByRunId(newRunId);
         return { result, caseTagList };
@@ -58,7 +64,10 @@ export class CloudBeatService {
         if (!newRunId) {
             throw new Error(`Unable to start a new run for monitor: ${monitorId}`);
         }
-        await this.waitForRunToFinish(newRunId, silent);
+        const isSuccess = await this.waitForRunToFinish(newRunId, silent);
+        if (!isSuccess) {
+            return { result: null, caseTagList: null };
+        }
         const result = await this.resultApi.getResultByRunId(newRunId);
         const caseTagList = await this.resultApi.getResultTestCasesTagsByRunId(newRunId);
         return { result, caseTagList: null };
@@ -104,7 +113,7 @@ export class CloudBeatService {
         await this.waitForSyncStatusToChange(projectId, commitHash);
     }
 
-    private async handleRealPooling(runId: string, silent: boolean, resolve: () => void) {
+    private async handleRealPooling(runId: string, silent: boolean, resolve: () => void, reject: (err: any) => void) {
         const runStatus: RunStatus = await this.runtimeApi.getRunStatus(runId);
         if (runStatus.status === RunStatusEnum.Pending
             || runStatus.status === RunStatusEnum.Initializing
@@ -132,19 +141,29 @@ export class CloudBeatService {
             resolve();
         }
         else if (runStatus.status === RunStatusEnum.Canceled) {
-            console.log(`Test with run id ${runId} has been canceled`);
-            resolve();
+            reject(`Test with run id ${runId} has been canceled`);
         }
     }
 
     private async waitForRunToFinish(runId: string, silent: boolean) {
         let intervalId;
-        await new Promise((resolve: any) => {
-            intervalId = setInterval(() => {
-                this.handleRealPooling(runId, silent, resolve);
-            }, RUN_POOLING_INTERVAL);
-        });
-        clearInterval(intervalId);
+
+        try {
+            await new Promise((resolve: any, reject: any) => {
+                intervalId = setInterval(() => {
+                    this.handleRealPooling(runId, silent, resolve, reject);
+                }, RUN_POOLING_INTERVAL);
+            });
+        }
+        catch (err) {
+            console.log(err);
+            return false;
+        }
+        finally {
+            clearInterval(intervalId);
+        }
+
+        return true;
     }
 
     private async waitForSyncStatusToChange(projectId: number, commitHash: string) {
