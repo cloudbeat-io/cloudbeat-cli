@@ -73,6 +73,7 @@ export class CloudBeatService {
         else {
             msg += RunStatusEnum[runStatus.status];
         }
+        console.log(msg);
     }
 
     public async getRunResult(runId: string) {
