@@ -26,7 +26,7 @@ If test execution succeeds exit code will be 0. Otherwise exit code will be 1.
 * `-e, --env <name>` - Specifies environment to use for test execution. Environment should be already defined in CloudBeat for the project whose test is being executed. 
 * `-a, --attr <attributes>` - Allows passing name-value pairs to test execution scripts. The passed data can be accessed via `attributes` property. E.g. `log.info(attributes)`.
 * `--release <releaseName>` - Name of the release or version to be associated with the test result.
-* `--build <buildName>` - Name of the build to be associated with the test result.
+* `--build <buildName>` - Name of the build to be associated with the test result. Requires specifying `--release` as well.
 * `--suffix <time|id>` - Report filename suffix to use. Must be either "time" or "id".
 * `--folder <folder>` - Path to a directory where test results will be saved. If not specified, results will be saved in the current working directory.
 * `--silent` - Do not print test progress details.  
