@@ -1,6 +1,6 @@
 {
   "name": "@cloudbeat/cli",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "CLI for CloudBeat API",
   "main": "build/index",
   "types": "build/index",
