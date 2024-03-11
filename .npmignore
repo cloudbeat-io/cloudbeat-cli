@@ -1,5 +1,8 @@
 src/*
 test/*
 *.xml
-.eslintrc.json
+.eslintrc.*
 babel.config.js
+.husky/*
+tsconfig.json
+mock-server/*
