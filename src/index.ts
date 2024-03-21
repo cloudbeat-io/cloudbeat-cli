@@ -32,7 +32,7 @@ program
         filePath,
     ) => {
         noCommandExecuted = false;
-        syncCmd(project, filePath, program.apiKey, program.apiBaseUrl);
+        syncCmd(project, filePath, program.apiKey, program.apiBaseUrl, program.failOnErrors);
     },
 );
 

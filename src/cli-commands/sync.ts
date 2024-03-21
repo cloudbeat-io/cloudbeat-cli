@@ -10,19 +10,18 @@ export default async function(
     apiKey: string,
     apiBaseUrl?: string,
     failOnErrors = true,
-    silent = false,
 ) {
     if (!filePath) {
         console.error('"filePath" argument must be specified.');
-        helper.finishCLI(failOnErrors);
+        helper.finishCLI(failOnErrors, false);
     }
     else if (!projectNameOrId) {
         console.error('"project" argument must be specified.');
-        helper.finishCLI(failOnErrors);
+        helper.finishCLI(failOnErrors, false);
     }
     if (!apiKey) {
         console.error('"apiKey" argument must be specified.');
-        helper.finishCLI(failOnErrors);
+        helper.finishCLI(failOnErrors, false);
     }
     const cb = new CloudBeatService({
         apiBaseUrl: apiBaseUrl,
@@ -36,7 +35,7 @@ export default async function(
         else {
             await cb.uploadProjectArtifactsById(projectNameOrId as number, filePath);
         }
-        helper.finishCLI(failOnErrors);
+        helper.finishCLI(failOnErrors, true);
     }
     catch (e: any) {
         let msg = 'Artifacts upload and synchronization failed:';
@@ -45,6 +44,6 @@ export default async function(
         }
         console.error(msg);
         console.error(e);
-        helper.finishCLI(failOnErrors);
+        helper.finishCLI(failOnErrors, false);
     }
 }

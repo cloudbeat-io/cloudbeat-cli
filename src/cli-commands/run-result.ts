@@ -6,7 +6,7 @@ export default async function(runId: string, apiKey: string, host = undefined, {
 }) {
     if (!runId) {
         console.error('"runId" argument must be specified.');
-        helper.finishCLI(failOnErrors);
+        helper.finishCLI(failOnErrors, false);
     }
     const cb = new CloudBeatService({
         apiBaseUrl: host,
@@ -15,7 +15,7 @@ export default async function(runId: string, apiKey: string, host = undefined, {
 
     try {
         const result = await cb.getRunResult(runId);
-        helper.finishCLI(failOnErrors, result);
+        helper.finishCLI(failOnErrors, !!result?.result?.isSuccess);
     }
  catch (e: any) {
         let msg = 'Failed to get run result:';
@@ -26,6 +26,6 @@ export default async function(runId: string, apiKey: string, host = undefined, {
             msg += ` Path: ${e.path}`;
         }
         console.log(msg);
-        helper.finishCLI(failOnErrors);
+        helper.finishCLI(failOnErrors, false);
     }
 }

@@ -12,34 +12,16 @@ export const getReporterInstance = (format: string, opts: IReporterOptions) => {
     throw new Error(`Reporter of this format does not exist: ${format}`);
 };
 
-export const finishCLI = (failOnErrors = true, result?: any) => {
-    let code = 1;
+export const finishCLI = (failOnErrors = true, isSuccess: boolean) => {
+    let code = isSuccess ? 0 : 1;
 
-    if (
-        result &&
-        result.result &&
-        typeof result.result.isSuccess !== 'undefined'
-    ) {
-        code = result.result.isSuccess ? 0 : 1;
-    }
-
-    if (failOnErrors?.toString() === 'false') {
-        failOnErrors = false;
-    }
-    else {
-        failOnErrors = true;
-    }
+    failOnErrors = failOnErrors?.toString() === 'false' ? false : true;
 
     if (failOnErrors) {
         // do nothing, all ok
     }
     else {
-        if (code === 0) {
-            code = 1;
-        }
-        else if (code === 1) {
-            code = 0;
-        }
+        code = 0;
     }
 
     process.exit(code);

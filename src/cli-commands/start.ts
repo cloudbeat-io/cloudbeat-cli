@@ -24,15 +24,15 @@ export default async function(testId: number | string, testType: string, apiKey:
 }) {
     if (!testId) {
         console.error('"testId" argument must be specified.');
-        helper.finishCLI(failOnErrors);
+        helper.finishCLI(failOnErrors, false);
     }
     else if (!testType) {
         console.error('"testType" argument must be specified.');
-        helper.finishCLI(failOnErrors);
+        helper.finishCLI(failOnErrors, false);
     }
     if (!apiKey) {
         console.error('"apiKey" argument must be specified.');
-        helper.finishCLI(failOnErrors);
+        helper.finishCLI(failOnErrors, false);
     }
     const cb = new CloudBeatService({
         apiBaseUrl: host,
@@ -96,7 +96,7 @@ export default async function(testId: number | string, testType: string, apiKey:
                 }
                 else {
                     console.error(`Folder "${folder}" does not exist`); // eslint-disable-line @typescript-eslint/restrict-template-expressions
-                    helper.finishCLI(failOnErrors);
+                    helper.finishCLI(failOnErrors, false);
                 }
             }
             else {
@@ -108,7 +108,7 @@ export default async function(testId: number | string, testType: string, apiKey:
             const reportFilePath = reporter.generate(result);
             console.log(`The report is ready: ${reportFilePath}`);
 
-            helper.finishCLI(failOnErrors, result);
+            helper.finishCLI(failOnErrors, !!result?.result?.isSuccess);
         }
         else {
             console.log('No results received from the server');
@@ -121,6 +121,6 @@ export default async function(testId: number | string, testType: string, apiKey:
         }
         console.error(msg);
         console.error(e);
-        helper.finishCLI(failOnErrors);
+        helper.finishCLI(failOnErrors, false);
     }
 }
