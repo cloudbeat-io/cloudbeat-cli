@@ -105,12 +105,12 @@ export class CloudBeatService {
         }
         const fileName = path.basename(filePath);
         const fileContent = fs.readFileSync(filePath);
-        const { commitHash } = await this.projectApi.getSyncStatus(projectId.toString()) || {};
-        if (!commitHash) {
+        const { syncDate } = await this.projectApi.getSyncStatus(projectId.toString()) || {};
+        if (!syncDate) {
             throw new Error('Unable to obtain sync status.');
         }
         await this.projectApi.uploadArtifacts(projectId.toString(), fileName, fileContent);
-        await this.waitForSyncStatusToChange(projectId, commitHash);
+        await this.waitForSyncStatusToChange(projectId, syncDate);
     }
 
     private async handleRealPooling(runId: string, silent: boolean, resolve: () => void, reject: (err: any) => void) {
@@ -166,12 +166,16 @@ export class CloudBeatService {
         return true;
     }
 
-    private async waitForSyncStatusToChange(projectId: number, commitHash: string) {
+    private async waitForSyncStatusToChange(projectId: number, syncDate: string) {
         let intervalId: any;
-        await new Promise((resolve: any) => {
+        await new Promise((resolve: any, reject: any) => {
             intervalId = setInterval(async () => {
-                const syncStatus = await this.projectApi.getSyncStatus(projectId.toString());
-                if (syncStatus.commitHash !== commitHash) {
+                const status = await this.projectApi.getSyncStatus(projectId.toString());
+                if (status.syncDate !== syncDate) {
+                    if (status.syncStatus === 'failure') {
+                        reject(status.message);
+                        return;
+                    }
                     resolve();
                 }
             }, STATUS_POOLING_INTERVAL);
