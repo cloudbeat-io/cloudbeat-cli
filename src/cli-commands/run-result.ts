@@ -15,9 +15,10 @@ export default async function(runId: string, apiKey: string, host = undefined, {
 
     try {
         const result = await cb.getRunResult(runId);
-        helper.finishCLI(failOnErrors, !!result?.result?.isSuccess);
+
+        helper.finishCLI(failOnErrors, result?.result?.instancesFailed === 0);
     }
- catch (e: any) {
+    catch (e: any) {
         let msg = 'Failed to get run result:';
         if(e && e.message){
             msg += ` ${e.message}`;

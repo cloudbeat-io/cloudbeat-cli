@@ -42,13 +42,12 @@ export function populateTestRunResult(runResult: any, builder: any, caseTagsHash
     // in that case, we might not have "instances" list in the result object
     else if (Array.isArray(runResult.cases) && runResult.cases.length > 0) {
         runResult.cases.map((caseResultSum: any, index: number) => {
-            const { caseName, testCaseId, caseFqn, isSuccess } = caseResultSum;
+            const { caseName, testCaseId, caseFqn, iterationsFailed } = caseResultSum;
             const testCase = suite.testCase()
                 .id(testCaseId || index)
                 .name(caseName)
-                .className(caseFqn || caseName)
-                .duration(0);
-            if (!isSuccess) {
+                .className(caseFqn || caseName);
+            if (iterationsFailed !== 0) {
                 testCase.failure(getUnknownFailureMessage());
             }
         });

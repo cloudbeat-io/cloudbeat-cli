@@ -16,11 +16,7 @@ export const finishCLI = (failOnErrors = true, isSuccess: boolean) => {
     let code = isSuccess ? 0 : 1;
 
     failOnErrors = failOnErrors?.toString() === 'false' ? false : true;
-
-    if (failOnErrors) {
-        // do nothing, all ok
-    }
-    else {
+    if (!failOnErrors) {
         code = 0;
     }
 

@@ -108,7 +108,7 @@ export default async function(testId: number | string, testType: string, apiKey:
             const reportFilePath = reporter.generate(result);
             console.log(`The report is ready: ${reportFilePath}`);
 
-            helper.finishCLI(failOnErrors, !!result?.result?.isSuccess);
+            helper.finishCLI(failOnErrors, result?.result?.instancesFailed === 0);
         }
         else {
             console.log('No results received from the server');
