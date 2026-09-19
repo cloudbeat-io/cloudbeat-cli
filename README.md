@@ -5,6 +5,51 @@
 
 ## Usage
 
+### AI assisted project setup
+The CLI ships a setup wizard for AI coding agents (currently Claude Code). Run the following in the root of your test automation project:
+```console
+npx @cloudbeat/cli init --agent claude
+```
+It installs the `/cloudbeat`, `/cloudbeat-kit` and `/cloudbeat-sync` commands and the `cloudbeat-setup` skill into `.claude/`. Open Claude Code in the same directory and run `/cloudbeat`: the wizard detects your test framework, installs and configures the matching CloudBeat Kit, creates a project in CloudBeat, and delivers your code using Git integration or file upload. Files you modified locally are not overwritten, unless `--force` is specified.
+
+### Authentication
+Instead of passing `--apiKey` and `--apiBaseUrl` to each command, the credentials can be stored once:
+```console
+cloudbeat-cli login [--apiBaseUrl <apiUrl>]
+```
+The API key is asked interactively (without being echoed) and saved to `~/.cloudbeat/config.json`. Use `login --stdin` to pipe the key in non-interactive environments.
+
+Credentials are resolved in the following order: `--apiKey`/`--apiBaseUrl` options, `CB_API_KEY`/`CB_API_URL` environment variables, stored configuration.
+
+* `cloudbeat-cli whoami` - shows and verifies the credentials in use.
+* `cloudbeat-cli logout` - removes the stored credentials.
+
+### JSON output
+`login`, `logout`, `whoami`, `git-info`, `pack` and `project` commands support the global `--json` option. A single JSON document with `"ok": true|false` is printed to stdout, which makes the commands suitable for scripts and AI agents.
+
+### Manage projects
+```console
+cloudbeat-cli project list
+cloudbeat-cli project create --name <name> --type <type> --sync <git|manual|none> [options]
+cloudbeat-cli project sync <projectNameOrId> [--dir <dir> | --file <zip>] [--wait]
+cloudbeat-cli project status <projectNameOrId>
+```
+
+**`project create` options**:
+
+* `--type <type>` - Oxygen, CucumberOxygen, CucumberJava, TestNG, JUnit, KotlinTestNG, KotlinJUnit5, MSTestBinary, NUnit3Binary, Playwright, CucumberJs, BellatrixJs, Cypress, Postman or Pytest.
+* `--sync git` - CloudBeat pulls the code from a Git repository. `--git-url` and `--git-branch` are detected from the current directory if not specified (SSH remotes are converted to HTTPS).
+* `--git-auth` - provide Git credentials now. They are asked interactively, or taken from `CB_GIT_TOKEN` (and optionally `CB_GIT_USERNAME`) environment variables. Without this option the credentials can be added later in the CloudBeat UI.
+* `--sync manual` - files are uploaded as a zip archive. Use `--dir <dir>` to pack and upload a directory, or `--file <zip>` to upload an existing archive.
+* `--exec-command`, `--exec-options`, `--assembly-names`, `--notes` - optional project settings.
+* `--wait` - wait for the initial synchronization to finish.
+
+`project sync` without `--dir`/`--file` triggers Git synchronization.
+
+### Helpers
+* `cloudbeat-cli git-info [dir]` - detects the Git repository URL, branch, and conditions which would prevent CloudBeat from seeing the latest code (unpushed commits, missing upstream, uncommitted changes).
+* `cloudbeat-cli pack [dir] [-o <zip>] [--list] [--all]` - packs a directory into a zip archive. `--all` includes git-ignored files as well (e.g. build output); it is also supported by `project create` and `project sync`. `.gitignore` is honored, additional exclusions can be listed in `.cbignore`. `node_modules`, `.git`, `.env*` and key files are never included.
+
 ### Execute a test case or suite:
 Following command will execute the specified Case or Suite, wait for the tests to finish, and will produce XML report in JUnit format: 
 ```console
