@@ -119,7 +119,7 @@ export const getGitInfo = (dir: string): IGitInfo => {
 
     // wizard files are never uploaded and are not relevant for the synchronization
     const changedFiles = (git(dir, ['status', '--porcelain'], false) || '').split('\n')
-        .filter(x => x && !/^.{3}"?(\.claude|\.cloudbeat)\//.test(x));
+        .filter(x => x && !/^.{3}"?(.*\/)?(\.claude|\.cloudbeat)\//.test(x));
     info.uncommittedChanges = changedFiles.length;
     info.uncommittedFiles = changedFiles.slice(0, 50);
     if (info.uncommittedChanges > 0) {
