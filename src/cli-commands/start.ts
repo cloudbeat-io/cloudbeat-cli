@@ -7,7 +7,7 @@ import { IReporterOptions } from '../types/IReporterOptions';
 export default async function(testId: number | string, testType: string, apiKey: string, {
     tags = undefined,
     attr = undefined,
-    host = undefined,
+    host = undefined as string | undefined,
     cwd = process.cwd(),
     projectName = undefined,
     reportFormat = DEFAULTS.TEST_REPORT_FORMAT,

@@ -35,7 +35,8 @@
   },
   "homepage": "https://github.com/oxygenhq/cloudbeat-cli#readme",
   "dependencies": {
-    "@cloudbeat/client": "1.4.0",
+    "@cloudbeat/client": "2.3.0",
+    "archiver": "5.3.2",
     "colors": "1.4.0",
     "commander": "5.1.0",
     "date-format": "0.0.2",
@@ -45,10 +46,11 @@
     "xmlbuilder": "15.1.1"
   },
   "devDependencies": {
+    "@cloudbeat/types": "1.0.8",
+    "@types/archiver": "5.3.4",
+    "@types/request": "2.48.13",
     "@typescript-eslint/eslint-plugin": "6.7.5",
     "@typescript-eslint/parser": "6.7.5",
-    "@cloudbeat/types": "1.0.8",
-    "@types/request": "2.48.13",
     "cross-env": "7.0.3",
     "eslint": "8.51.0",
     "eslint-config-prettier": "8.10.2",

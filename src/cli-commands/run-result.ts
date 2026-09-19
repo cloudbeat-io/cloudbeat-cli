@@ -1,7 +1,7 @@
 import { CloudBeatService } from '../lib/CloudBeatService';
 import * as helper from '../lib/helper';
 
-export default async function(runId: string, apiKey: string, host = undefined, {
+export default async function(runId: string, apiKey: string, host: string | undefined = undefined, {
     failOnErrors = false,
 }) {
     if (!runId) {
