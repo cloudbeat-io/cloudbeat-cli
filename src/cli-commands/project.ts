@@ -52,13 +52,13 @@ const waitForSync = async (api: ProjectApi, projectId: number, previousSyncDate?
     throw new Error('Timed out waiting for project synchronization to finish.');
 };
 
-const finishWithSyncStatus = (data: object, syncStatus: { syncStatus?: string; message?: string } | undefined, humanMessage: string) => {
+const finishWithSyncStatus = (data: object, syncStatus: { syncStatus?: string; message?: string; details?: string } | undefined, humanMessage: string) => {
     if (syncStatus && syncStatus.syncStatus === SYNC_FAILURE) {
         if (out.isJsonMode()) {
             // the main operation succeeded, but synchronization did not - let the caller decide what to do
             return out.success({ ...data, sync: syncStatus });
         }
-        return out.fail(`${humanMessage}\nSynchronization failed: ${syncStatus.message || 'unknown reason'}`);
+        return out.fail(`${humanMessage}\nSynchronization failed: ${[syncStatus.message, syncStatus.details].filter(x => x).join(' ') || 'unknown reason'}`);
     }
     return out.success({ ...data, sync: syncStatus }, humanMessage);
 };
@@ -202,7 +202,7 @@ export const status = async (auth: IAuth, projectNameOrId: string) => {
         const syncStatus = await api.getSyncStatus(projectId.toString());
         return out.success(
             { projectId, sync: syncStatus },
-            `Sync status: ${syncStatus.syncStatus || 'never synchronized'}${syncStatus.message ? ` - ${syncStatus.message}` : ''}`,
+            `Sync status: ${syncStatus.syncStatus || 'never synchronized'}${syncStatus.message ? ` - ${[syncStatus.message, syncStatus.details].filter(x => x).join(' ')}` : ''}`,
         );
     }
     catch (e: any) {

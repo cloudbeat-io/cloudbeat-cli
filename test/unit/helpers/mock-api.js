@@ -25,7 +25,11 @@ function startMockApi() {
                 res.end(typeof payload === 'string' ? payload : JSON.stringify(payload));
             };
 
-            if (url.searchParams.get('apiKey') !== API_KEY) {
+            // the key must arrive as a header - never in the URL
+            if (url.searchParams.has('apiKey')) {
+                return send(400, 'apiKey must not be sent as a query parameter');
+            }
+            if (req.headers['x-api-key'] !== API_KEY) {
                 return send(401, 'Invalid apiKey');
             }
             const path = url.pathname;
