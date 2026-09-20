@@ -94,7 +94,7 @@ export const test = base.extend<{ cloudbeatConsole: void }>({
 });
 export { expect } from '@playwright/test';
 ```
-Merge into the project's existing `extend` call rather than creating a second `test` object. If tests open additional pages (`context.newPage()`), subscribe at context level instead: `context.on('page', p => p.on('console', cb.onConsole))` (with the same `CB_RUN_ID` guard).
+Match the project's indentation and quote style. Merge into the project's existing `extend` call rather than creating a second `test` object. If tests open additional pages (`context.newPage()`), subscribe at context level instead: `context.on('page', p => p.on('console', cb.onConsole))` (with the same `CB_RUN_ID` guard).
 
 No fixtures file - create one (e.g. `tests/fixtures.ts`, following the project's layout) with the content above, and change `import { test, expect } from '@playwright/test'` in the spec files to import from it.
 
@@ -110,9 +110,10 @@ cb.setFailureReason(reason);          // classify a failure (FailureReasonEnum f
 ```
 
 ## Verification
-- `npx playwright test --list` must succeed and list the same tests as before (it loads the config and all spec files without running them).
+- `npx playwright test --list` must succeed and list the same tests as before (it loads the config and all spec files without running them). Check the exit code of the command itself - piping it through `tail`/`head` hides it.
+- `npm ls @playwright/test` must show a single copy. The kit depends on `@playwright/test`; if the project pins an older version a second, nested copy gets installed and Playwright fails with "Requiring @playwright/test second time" - then propose aligning the project's Playwright version.
 - TypeScript projects with a type-check script: run it. Without such a script (or without a `tsconfig.json`) do not run `tsc` ad hoc - Playwright compiles the tests itself, and an ad hoc run fails for reasons unrelated to the kit.
-- `npm audit` findings printed during the installation: mention them only if they come from `@cloudbeat/*` packages (`npm audit --json`); pre-existing findings are out of scope.
+- `npm audit` findings printed during the installation: mention them only if they come from `@cloudbeat/*` packages or from their transitive dependencies (`npm audit --json`); pre-existing findings are out of scope.
 
 ## Project settings for CloudBeat
 - `--type Playwright`. The default command is `npx playwright test`; pass `--exec-command` only when the project needs something else (a specific config file: `npx playwright test -c e2e/playwright.config.ts`).

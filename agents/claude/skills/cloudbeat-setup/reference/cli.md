@@ -20,9 +20,9 @@ With `--wait`, a synchronization that finishes with a failure is still `"ok": tr
 
 | Command | Purpose |
 |---------|---------|
-| `cb --json whoami` | are we logged in, and where. `apiBaseUrl`, masked `apiKey`, `verified` |
+| `cb --json whoami` | are we logged in, and where. `apiBaseUrl`, masked `apiKey`, `source`, `verified`, `projectCount` |
 | `cb login [--apiBaseUrl <url>]` | **interactive, run by the user** (`! cloudbeat-cli login`). Hidden prompt for the API key, stored in `~/.cloudbeat/config.json` |
-| `cb --json git-info [dir]` | `isGitRepo`, `rootDir`, `remoteName`, `remoteUrlHadCredentials`, `httpsUrl`, `remoteUrl`, `branch`, `subDir`, `isSshRemote`, `hasUpstream`, `unpushedCommits` (only when there is an upstream), `uncommittedChanges`, `uncommittedFiles[]` (the wizard's `.claude/` and `.cloudbeat/` folders are not counted), `warnings[]` |
+| `cb --json git-info [dir]` | `isGitRepo`, `rootDir`, `remoteName`, `remoteUrlHadCredentials`, `httpsUrl`, `remoteUrl`, `branch`, (remote related fields are absent when the repository has no remote) `subDir`, `isSshRemote`, `hasUpstream`, `unpushedCommits` (only when there is an upstream), `uncommittedChanges`, `uncommittedFiles[]` (the wizard's `.claude/` and `.cloudbeat/` folders are not counted), `warnings[]` |
 | `cb --json pack [dir] --list` | files that would be uploaded - use it to preview an upload |
 | `cb --json project list` | `projects[]` with `id`, `name`, `type` |
 | `cb --json project create --name <n> --type <t> --sync <git\|manual\|none> [...]` | creates a project, returns `projectId` |

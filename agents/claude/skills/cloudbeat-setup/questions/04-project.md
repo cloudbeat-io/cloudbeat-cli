@@ -19,7 +19,7 @@ Run `cb --json project list` first.
 
 ## Q3 - Test command
 - **Ask when:** the project is not run by the type's standard command - e.g. tests are started through a custom npm script, a Maven profile, a specific `testng.xml`, or a sub-directory.
-- **Default:** keep CloudBeat's default for the type (do not pass `--exec-command`).
+- **Default:** keep CloudBeat's default for the type (do not pass `--exec-command`). When the question is skipped, still state the command CloudBeat will use in one line, so the user can object.
 - When needed, propose the command detected in phase 1 and pass it as `--exec-command`. For Java, suite files/profiles go to `--exec-options`.
 - .NET binary types: instead of a command, `--assembly-names` is required - the test assembly file name(s), e.g. `Acme.Tests.dll`, taken from the `.csproj` (`AssemblyName` or the project file name).
 

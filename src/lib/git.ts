@@ -87,6 +87,12 @@ export const getGitInfo = (dir: string): IGitInfo => {
     const upstreamRemote = upstream ? remotes.find(r => upstream.startsWith(`${r}/`)) : undefined;
     info.remoteName = upstreamRemote || (remotes.includes('origin') ? 'origin' : remotes[0]);
 
+    // wizard files are never uploaded and are not relevant for the synchronization
+    const changedFiles = (git(dir, ['status', '--porcelain'], false) || '').split('\n')
+        .filter(x => x && !/^.{3}"?(.*\/)?(\.claude|\.cloudbeat)\//.test(x));
+    info.uncommittedChanges = changedFiles.length;
+    info.uncommittedFiles = changedFiles.slice(0, 50);
+
     if (!info.remoteName) {
         warnings.push('Repository has no remotes configured.');
         return info;
@@ -117,11 +123,6 @@ export const getGitInfo = (dir: string): IGitInfo => {
         warnings.push(`Branch "${info.branch}" has no upstream - it may not exist on the remote.`);
     }
 
-    // wizard files are never uploaded and are not relevant for the synchronization
-    const changedFiles = (git(dir, ['status', '--porcelain'], false) || '').split('\n')
-        .filter(x => x && !/^.{3}"?(.*\/)?(\.claude|\.cloudbeat)\//.test(x));
-    info.uncommittedChanges = changedFiles.length;
-    info.uncommittedFiles = changedFiles.slice(0, 50);
     if (info.uncommittedChanges > 0) {
         warnings.push(`${info.uncommittedChanges} uncommitted change(s) - CloudBeat will not see them.`);
     }

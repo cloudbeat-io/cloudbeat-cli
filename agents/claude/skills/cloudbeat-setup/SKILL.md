@@ -14,11 +14,11 @@ All files referenced below are relative to this skill's directory.
 1. **Secrets never go through the chat.** Never ask the user to type or paste an API key, Git token or password into the conversation, never pass one as a command line argument, and never print the content of `~/.cloudbeat/config.json`. When a secret is needed, ask the user to run the CLI command themselves by typing `! <command>` in the prompt - the CLI asks for the secret with hidden input. If the user pastes a secret anyway, tell them to revoke it and create a new one. The masked key printed by `whoami` (`abcd…wxyz`) is not a secret and may appear in output.
 2. **Every CloudBeat operation goes through the CLI** (see `reference/cli.md`). Always pass `--json` and parse the result. Never call the CloudBeat API directly with curl.
 3. **Approval gate before writing.** Before modifying any file of the user's project, show the complete list of files and the exact changes, and wait for explicit approval. No approval - no edits. The only exception is the wizard's own state file `.cloudbeat/setup.md`, which you may create and update at any time.
-4. **Confirm before creating things in CloudBeat.** Right before `project create` (or the first upload to an existing project), state in one line what will happen - "I will now create project *X* (type *Y*, Git: *url* @ *branch*) on *apiBaseUrl*" - and get a yes. This is the only gate for CloudBeat operations; read-only commands (`whoami`, `project list`, `git-info`, `pack --list`, `project status`) need no confirmation.
+4. **Confirm before creating things in CloudBeat.** Right before `project create` (or the first upload to an existing project), state in one line what will happen - "I will now create project *X* (type *Y*, Git: *url* @ *branch*) on *apiBaseUrl*", or for uploads "... (type *Y*, file upload of *dir*, *N* files) on *apiBaseUrl*" - and get a yes. This is the only gate for CloudBeat operations; read-only commands (`whoami`, `project list`, `git-info`, `pack --list`, `project status`) need no confirmation.
 5. **Stay in scope.** Touch only build files, test configuration, and the test bootstrap code named in the kit recipe. Never change test logic, application code, or CI pipelines unless asked.
 6. **Only offer what the kit supports.** Each recipe in `kits/` declares its capabilities. Do not offer an option a kit does not have, and tell the user plainly when something they expect (e.g. network capture) is not available for their framework.
 7. **Ask well.** Use the AskUserQuestion tool when it is available, otherwise ask in plain text. The tool allows at most 4 options per question (the user can always type something else): when a question file lists more, keep the most likely ones and fold the rest into the free-text answer. One step at a time, at most 4 questions per step, always with a recommended default taken from detection. Skip a question when the answer is already known.
-8. **Be resumable.** Keep the state in `.cloudbeat/setup.md` (format below). Read it first on every run and continue from the first unfinished phase. Update it at the end of every phase.
+8. **Be resumable.** Keep the state in `.cloudbeat/setup.md` (format below; create the `.cloudbeat` folder if needed). Read it first on every run and continue from the first unfinished phase. Update it at the end of every phase.
 9. **Report honestly.** If a command fails, show the error from the JSON output and diagnose it. Never claim a step succeeded without checking its result.
 
 ## Phases
@@ -79,7 +79,7 @@ Print a recap: kit and options installed, files changed, project name and id, de
 
 - updated: <ISO date>
 - phase: <last completed phase number; a skipped phase counts as completed>
-- kit: installed | declined | not available | not needed
+- kit: not installed yet | installed | declined | not available | not needed
 
 ## Stack
 - flavor: <recipe name, e.g. java-testng-selenium>
@@ -98,7 +98,7 @@ Print a recap: kit and options installed, files changed, project name and id, de
 - delivery: git | upload
 - git url / branch: ...
 - git credentials: provided | later in CloudBeat UI | not needed
-- last sync: <status> at <date>
+- last sync: <status> at <date>   (for uploads the CLI's `commitHash` is a generated id, not a Git hash)
 
 ## Left for the user
 - ...
