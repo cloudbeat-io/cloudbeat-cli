@@ -64,7 +64,7 @@ For "Later" on a private repository the first synchronization **is expected to f
 ## After creation / synchronization
 - Check `sync.syncStatus` in the result, not just `ok`.
   - `success` -> report the project id and continue to the wrap-up.
-  - `failure` -> show `sync.message`. Authentication failure -> if the user chose "Later" in Q3 this is the expected outcome: do not ask again, record it and go on to the wrap-up; otherwise the credentials were wrong - the user fixes them in the project settings in CloudBeat and runs `/cloudbeat-sync`. Branch not found -> the branch is not pushed. Other -> show the message as is.
+  - `failure` -> show `sync.message` and `sync.details` (the details hold the real reason). Authentication failure -> if the user chose "Later" in Q3 this is the expected outcome: do not ask again, record it and go on to the wrap-up; otherwise the credentials were wrong - the user fixes them in the project settings in CloudBeat and runs `/cloudbeat-sync`. Branch not found -> the branch is not pushed. Other -> show the message as is.
   - In every case the phase counts as completed once the project exists; the sync outcome is recorded in `last sync`.
   - timeout -> the synchronization is still running; `cb --json project status <id>` shows the outcome later.
 - Save the project id, delivery method, URL/branch and the credentials choice to `.cloudbeat/setup.md`.

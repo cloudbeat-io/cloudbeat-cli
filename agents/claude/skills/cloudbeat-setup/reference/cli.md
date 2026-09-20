@@ -14,7 +14,7 @@ Exactly one JSON document on stdout:
 
 Codes: `not_logged_in`, `invalid_api_key`, `no_api_key`, `invalid_args`, `error`.
 
-With `--wait`, a synchronization that finishes with a failure is still `"ok": true` (the command itself worked) - always check `sync.syncStatus` (`success` | `failure` | `in progress`) and `sync.message`.
+With `--wait`, a synchronization that finishes with a failure is still `"ok": true` (the command itself worked) - always check `sync.syncStatus` (`success` | `failure` | `in progress`), `sync.message` and `sync.details` (the actual reason, e.g. "Authentication failed..." behind the generic message "Git operation failed.").
 
 ## Commands
 
