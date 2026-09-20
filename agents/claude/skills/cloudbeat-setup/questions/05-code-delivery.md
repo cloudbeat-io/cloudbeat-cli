@@ -5,7 +5,9 @@ Goal: the test code is in CloudBeat and the first synchronization succeeded.
 ## Procedure
 Run `cb --json git-info` in the project root before asking anything. Most users open the agent inside a cloned repository, so the repository URL and branch can usually be detected.
 
-Then probe the remote **anonymously** - this validates the URL, tells whether the repository is public, and whether the branch exists there:
+**No remote** (`remoteName` / `httpsUrl` missing): skip the probe and Q2-Q3. Present file upload as the only workable option right now, and mention that Git integration becomes available once the repository has a remote (`/cloudbeat` can be re-run then).
+
+Otherwise probe the remote **anonymously** - this validates the URL, tells whether the repository is public, and whether the branch exists there:
 
 `GIT_TERMINAL_PROMPT=0 git -c credential.helper= ls-remote --heads <httpsUrl> <branch>`
 
@@ -57,7 +59,7 @@ For "Later" on a private repository the first synchronization **is expected to f
 
 ## File upload
 1. Preview: `cb --json pack . --list`. Show the file count and the top-level entries. Check the list for things that should not be uploaded (build output, reports, videos, large binaries, credentials) and propose a `.cbignore` for them. `.env*`, keys, `node_modules` and `.git` are excluded automatically.
-2. Ask for confirmation, then create and upload in one command:
+2. Confirm once - this is the same confirmation as ground rule 4 of SKILL.md, not a second one - then create and upload in one command:
    `cb --json project create --name "<name>" --type <Type> --sync manual --dir . --wait`
    (existing project: `cb --json project sync <id> --dir . --wait`)
 
