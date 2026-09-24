@@ -43,7 +43,7 @@
     "date-format": "0.0.2",
     "junit-report-builder": "3.2.1",
     "mkdirp": "3.0.1",
-    "moment": "2.30.1",
+    "moment": "2.31.0",
     "xmlbuilder": "15.1.1"
   },
   "devDependencies": {
