@@ -1,18 +1,19 @@
 # CloudBeat CLI reference for the wizard
 
 ## Invoking the CLI
-Use the first one that works:
-1. `cloudbeat-cli` - globally installed
-2. `npx -y @cloudbeat/cli` - no installation needed (requires Node.js 18+)
+Use the first one that works (details in `../questions/01-connect.md`):
+1. `npx --no -- cloudbeat-cli` - installed in the project (`devDependencies`); works without internet access
+2. `cloudbeat-cli` - globally installed
+3. `npx -y @cloudbeat/cli` - downloads the CLI from the npm registry (requires Node.js 18+ and registry access)
 
 Below, `cb` stands for whichever works. Always add `--json` (a global option, it goes right after `cb`).
 
 ## Output contract
 Exactly one JSON document on stdout:
 - success: `{ "ok": true, ... }`, exit code 0
-- failure: `{ "ok": false, "code": "<code>", "error": "<message>" }`, exit code 1
+- failure: `{ "ok": false, "code": "<code>", "error": "<message>" }`, exit code 1. `whoami` and `login` failures also include `apiBaseUrl` - the URL used (for `not_logged_in`: the URL a login would use).
 
-Codes: `not_logged_in`, `invalid_api_key`, `no_api_key`, `invalid_args`, `error`.
+Codes: `not_logged_in`, `invalid_api_key`, `connection_failed` (the API URL could not be reached: DNS, port, firewall/proxy, TLS certificate - no HTTP response), `no_api_key`, `invalid_args`, `error`.
 
 With `--wait`, a synchronization that finishes with a failure is still `"ok": true` (the command itself worked) - always check `sync.syncStatus` (`success` | `failure` | `in progress`), `sync.message` and `sync.details` (the actual reason, e.g. "Authentication failed..." behind the generic message "Git operation failed.").
 
@@ -21,7 +22,7 @@ With `--wait`, a synchronization that finishes with a failure is still `"ok": tr
 | Command | Purpose |
 |---------|---------|
 | `cb --json whoami` | are we logged in, and where. `apiBaseUrl`, masked `apiKey`, `source`, `verified`, `projectCount` |
-| `cb login [--apiBaseUrl <url>]` | **interactive, run by the user** (`! cloudbeat-cli login`). Hidden prompt for the API key, stored in `~/.cloudbeat/config.json` |
+| `cb login [--apiBaseUrl <url>]` | **interactive, run by the user** (`! <cb> login --apiBaseUrl <url>`, see `../questions/01-connect.md`). Hidden prompt for the API key, stored in `~/.cloudbeat/config.json` |
 | `cb --json git-info [dir]` | `isGitRepo`, `rootDir`, `remoteName`, `remoteUrlHadCredentials`, `httpsUrl`, `remoteUrl`, `branch`, (remote related fields are absent when the repository has no remote) `subDir`, `isSshRemote`, `hasUpstream`, `unpushedCommits` (only when there is an upstream), `uncommittedChanges`, `uncommittedFiles[]` (the wizard's `.claude/` and `.cloudbeat/` folders are not counted), `warnings[]` |
 | `cb --json pack [dir] --list` | files that would be uploaded - use it to preview an upload |
 | `cb --json project list` | `projects[]` with `id`, `name`, `type` |

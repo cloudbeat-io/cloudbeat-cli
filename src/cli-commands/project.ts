@@ -91,7 +91,7 @@ export const list = async (auth: IAuth) => {
         return out.success({ projects }, projects.map(p => `${p.id}\t${p.type}\t${p.name}`).join('\n') || 'No projects found.');
     }
     catch (e: any) {
-        return out.fail(`Failed to list projects: ${out.errorMessage(e)}`);
+        return out.fail(`Failed to list projects: ${out.errorMessage(e)}`, out.apiErrorCode(e));
     }
 };
 
@@ -180,7 +180,7 @@ export const create = async (auth: IAuth, opts: IProjectCreateOptions) => {
         return out.success(data, humanMessage);
     }
     catch (e: any) {
-        return out.fail(`Failed to create project: ${out.errorMessage(e)}`);
+        return out.fail(`Failed to create project: ${out.errorMessage(e)}`, out.apiErrorCode(e));
     }
 };
 
@@ -206,7 +206,7 @@ export const status = async (auth: IAuth, projectNameOrId: string) => {
         );
     }
     catch (e: any) {
-        return out.fail(`Failed to get project status: ${out.errorMessage(e)}`);
+        return out.fail(`Failed to get project status: ${out.errorMessage(e)}`, out.apiErrorCode(e));
     }
 };
 
@@ -234,6 +234,6 @@ export const sync = async (auth: IAuth, projectNameOrId: string, opts: { dir?: s
         return out.success(data, humanMessage);
     }
     catch (e: any) {
-        return out.fail(`Project synchronization failed: ${out.errorMessage(e)}`);
+        return out.fail(`Project synchronization failed: ${out.errorMessage(e)}`, out.apiErrorCode(e));
     }
 };

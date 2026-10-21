@@ -3,6 +3,13 @@
 ## Installation:
 ```npm install -g @cloudbeat/cli```
 
+Or per project, as a development dependency - recommended for closed networks where only `npm i` from an internal registry is possible, since nothing is downloaded at run time:
+```console
+npm install -D @cloudbeat/cli
+npx --no -- cloudbeat-cli whoami
+```
+The setup wizard (see below) uses the project's CLI first, then a global one, and downloads it with `npx -y @cloudbeat/cli` only as the last resort.
+
 ## Usage
 
 ### AI assisted project setup
@@ -21,11 +28,17 @@ The API key is asked interactively (without being echoed) and saved to `~/.cloud
 
 Credentials are resolved in the following order: `--apiKey`/`--apiBaseUrl` options, `CB_API_KEY`/`CB_API_URL` environment variables, stored configuration.
 
+**Self-hosted CloudBeat:** pass the API URL of your installation once - it is stored with the key and used by all later commands:
+```console
+cloudbeat-cli login --apiBaseUrl https://cloudbeat.company.local
+```
+If the server uses a certificate issued by your company's own certificate authority, point Node.js to it with `NODE_EXTRA_CA_CERTS=/path/to/company-ca.pem`; a required proxy is taken from `HTTPS_PROXY` / `HTTP_PROXY` (and `NO_PROXY`).
+
 * `cloudbeat-cli whoami` - shows and verifies the credentials in use.
 * `cloudbeat-cli logout` - removes the stored credentials.
 
 ### JSON output
-`login`, `logout`, `whoami`, `git-info`, `pack` and `project` commands support the global `--json` option. A single JSON document with `"ok": true|false` is printed to stdout, which makes the commands suitable for scripts and AI agents.
+`login`, `logout`, `whoami`, `git-info`, `pack` and `project` commands support the global `--json` option. A single JSON document with `"ok": true|false` is printed to stdout, which makes the commands suitable for scripts and AI agents. Failures carry a `code`: `not_logged_in`, `invalid_api_key`, `connection_failed` (the API URL could not be reached - DNS, port, firewall/proxy or TLS certificate), `no_api_key`, `invalid_args` or `error`. `whoami` and `login` failures also include the `apiBaseUrl` that was used.
 
 ### Manage projects
 ```console

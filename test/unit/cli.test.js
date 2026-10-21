@@ -7,6 +7,9 @@ const path = require('path');
 const { API_KEY, startMockApi } = require('./helpers/mock-api');
 const { runCli } = require('./helpers/run-cli');
 
+// nothing listens on the discard port locally, so connections are refused right away
+const UNREACHABLE_URL = 'http://127.0.0.1:9';
+
 describe('cloudbeat-cli end to end', () => {
     let api;
     let tmpDir;
@@ -50,6 +53,7 @@ describe('cloudbeat-cli end to end', () => {
         const r = await cli(['--json', 'whoami']);
         assert.strictEqual(r.code, 1);
         assert.strictEqual(r.json.code, 'not_logged_in');
+        assert.strictEqual(r.json.apiBaseUrl, 'https://api.cloudbeat.io');
     });
 
     it('commands requiring credentials fail with not_logged_in', async () => {
@@ -90,6 +94,23 @@ describe('cloudbeat-cli end to end', () => {
         const r = await cli(['--json', 'whoami'], { env: { CB_API_KEY: 'other-key' } });
         assert.strictEqual(r.code, 1);
         assert.strictEqual(r.json.code, 'invalid_api_key');
+    });
+
+    it('whoami reports connection_failed when the API URL cannot be reached', async () => {
+        const r = await cli(['--json', '--apiBaseUrl', UNREACHABLE_URL, 'whoami']);
+        assert.strictEqual(r.code, 1);
+        assert.strictEqual(r.json.code, 'connection_failed');
+        assert.strictEqual(r.json.apiBaseUrl, UNREACHABLE_URL);
+        assert.ok(!r.stdout.includes(API_KEY));
+    });
+
+    it('login to an unreachable URL fails with connection_failed and keeps the stored credentials', async () => {
+        const configPath = path.join(configDir, 'config.json');
+        const storedConfig = fs.readFileSync(configPath, 'utf8');
+        const r = await cli(['--json', '--apiBaseUrl', UNREACHABLE_URL, 'login', '--stdin'], { stdin: `${API_KEY}\n` });
+        assert.strictEqual(r.code, 1);
+        assert.strictEqual(r.json.code, 'connection_failed');
+        assert.strictEqual(fs.readFileSync(configPath, 'utf8'), storedConfig);
     });
 
     it('project list returns ids', async () => {

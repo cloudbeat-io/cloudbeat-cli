@@ -27,9 +27,9 @@ export const success = (data: object, humanMessage?: string): never => {
     process.exit(0);
 };
 
-export const fail = (message: string, code = 'error'): never => {
+export const fail = (message: string, code = 'error', data: object = {}): never => {
     if (jsonMode) {
-        console.log(JSON.stringify({ ok: false, code, error: message }, undefined, 2));
+        console.log(JSON.stringify({ ok: false, code, error: message, ...data }, undefined, 2));
     }
     else {
         console.error(message);
@@ -43,4 +43,22 @@ export const errorMessage = (e: any): string => {
     const status = httpStatus(e);
     const msg = e?.message || String(e);
     return status ? `${msg} (HTTP ${status})` : msg;
+};
+
+// network level failures (no HTTP response): wrong host or port, server down, firewall/proxy, TLS certificate problems.
+// The API client keeps only the message of the underlying error, so the message is matched as well as the code.
+const CONNECTION_ERROR_PATTERN = new RegExp([
+    'ECONNREFUSED', 'ECONNRESET', 'ENOTFOUND', 'EAI_AGAIN', 'ETIMEDOUT', 'ESOCKETTIMEDOUT', 'EHOSTUNREACH', 'ENETUNREACH',
+    'ECONNABORTED', 'timeout of \\d+ms exceeded', 'socket hang up', 'certificate', 'UNABLE_TO_VERIFY_LEAF_SIGNATURE',
+].join('|'), 'i');
+
+export const isConnectionError = (e: any): boolean =>
+    !httpStatus(e) && CONNECTION_ERROR_PATTERN.test(`${e?.code || ''} ${e?.message || ''}`);
+
+// error code for a failed API call: invalid_api_key, connection_failed or error
+export const apiErrorCode = (e: any): string => {
+    if (httpStatus(e) === 401) {
+        return 'invalid_api_key';
+    }
+    return isConnectionError(e) ? 'connection_failed' : 'error';
 };
