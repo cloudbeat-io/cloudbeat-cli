@@ -49,7 +49,9 @@ export const login = async ({ apiKey, apiBaseUrl, stdin }: { apiKey?: string; ap
         );
     }
     catch (e: any) {
-        return out.fail(`Login failed: ${out.errorMessage(e)}`, out.httpStatus(e) === 401 ? 'invalid_api_key' : 'error');
+        const code = out.apiErrorCode(e);
+        const reason = code === 'connection_failed' ? `could not connect to ${baseUrl}: ` : '';
+        return out.fail(`Login failed: ${reason}${out.errorMessage(e)}`, code, { apiBaseUrl: baseUrl });
     }
 };
 
@@ -61,7 +63,9 @@ export const logout = () => {
 export const whoami = async (flags: { apiKey?: string; apiBaseUrl?: string }) => {
     const auth = resolveAuth(flags);
     if (!auth) {
-        return out.fail('Not logged in. Run "cloudbeat-cli login".', 'not_logged_in');
+        // the URL a following "login" would use, so the caller can show it without reading the config file
+        const apiBaseUrl = flags.apiBaseUrl || process.env.CB_API_URL || loadConfig().apiBaseUrl || DEFAULT_API_BASE_URL;
+        return out.fail('Not logged in. Run "cloudbeat-cli login".', 'not_logged_in', { apiBaseUrl });
     }
     try {
         const projectCount = await verifyApiKey(auth.apiKey, auth.apiBaseUrl);
@@ -71,6 +75,10 @@ export const whoami = async (flags: { apiKey?: string; apiBaseUrl?: string }) =>
         );
     }
     catch (e: any) {
-        return out.fail(`Stored credentials are not valid: ${out.errorMessage(e)}`, out.httpStatus(e) === 401 ? 'invalid_api_key' : 'error');
+        const code = out.apiErrorCode(e);
+        const message = code === 'connection_failed'
+            ? `Could not connect to ${auth.apiBaseUrl}: ${out.errorMessage(e)}`
+            : `Stored credentials are not valid: ${out.errorMessage(e)}`;
+        return out.fail(message, code, { apiBaseUrl: auth.apiBaseUrl, source: auth.source });
     }
 };

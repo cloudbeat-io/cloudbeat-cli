@@ -7,7 +7,7 @@ description: Synchronize this test project with CloudBeat - trigger Git synchron
 Read `.claude/skills/cloudbeat-setup/reference/cli.md` for the CLI contract (`cb` below is the CLI, always with `--json`). The ground rules of `.claude/skills/cloudbeat-setup/SKILL.md` apply: no secrets in the chat.
 
 1. Read `.cloudbeat/setup.md`. No project id recorded -> tell the user to run `/cloudbeat` first (or ask for the project name/id if they created the project elsewhere, and look it up with `cb --json project list`).
-2. `cb --json whoami` - if not logged in, ask the user to run `! cloudbeat-cli login`.
+2. `cb --json whoami` - if it fails (`not_logged_in`, `invalid_api_key`, `connection_failed`), follow `.claude/skills/cloudbeat-setup/questions/01-connect.md` (which CloudBeat instance, login, connection problems), then continue.
 3. By delivery method:
 
    **git**
