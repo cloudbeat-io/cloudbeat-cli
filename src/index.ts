@@ -9,6 +9,7 @@ import initCmd from './cli-commands/init';
 import { login, logout, whoami } from './cli-commands/login';
 import packCmd from './cli-commands/pack';
 import * as projectCmd from './cli-commands/project';
+import * as resultsCmd from './cli-commands/results';
 import runResultCmd from './cli-commands/run-result';
 import runStatusCmd from './cli-commands/run-status';
 import startCmd from './cli-commands/start';
@@ -29,7 +30,7 @@ program
 .option('--apiKey <apiKey>', 'your CloudBeat API key. if not specified, CB_API_KEY environment variable or the key stored by "login" command is used')
 .option('--apiBaseUrl <apiUrl>', 'API URL for a privately hosted CloudBeat instance (i.e. your local alternative to https://api.cloudbeat.io)')
 .option('-f, --failOnErrors <true|false>', 'controls whether to return non-successful exit code on errors or not')
-.option('--json', 'print command result as JSON (supported by: login, logout, whoami, init, git-info, pack, project)');
+.option('--json', 'print command result as JSON (supported by: login, logout, whoami, init, git-info, pack, project, results)');
 
 // resolves credentials from command line flags, environment variables, or the config stored by "login" command
 const getAuth = (): IAuth => {
@@ -168,6 +169,47 @@ projectCommands
 .action((projectNameOrId) => {
     noCommandExecuted = false;
     projectCmd.status(getAuth(), projectNameOrId);
+});
+
+// results commands
+const resultsCommands = program
+.command('results', { isDefault: false })
+.description('analyze failed tests: recent failures, last failure of a case or suite, failure breakdown of a run');
+
+resultsCommands
+.command('failures')
+.storeOptionsAsProperties(false)
+.passCommandToAction(false)
+.option('--project <projectName>', 'only tests of this project')
+.option('--hours <hours>', 'how far back to look, in hours (default: 168 = 7 days)')
+.description('list recently failed cases and suites, with the time of their last failure')
+.action((opts) => {
+    noCommandExecuted = false;
+    resultsCmd.failures(getAuth(), opts);
+});
+
+resultsCommands
+.command('last-failure <name>')
+.storeOptionsAsProperties(false)
+.passCommandToAction(false)
+.option('--suite', '<name> is a suite name (a case name by default)')
+.option('--snapshots <dir>', 'save the failure and baseline snapshots (if any) to this directory')
+.description('show why a test case or suite failed last time: error, location and stack trace')
+.action((name, opts) => {
+    noCommandExecuted = false;
+    resultsCmd.lastFailure(getAuth(), name, opts);
+});
+
+resultsCommands
+.command('run <runId>')
+.storeOptionsAsProperties(false)
+.passCommandToAction(false)
+.option('--logs <lines>', 'number of last log lines to show per failed iteration (default: 20, 0 = none)')
+.option('--all', 'include passed iterations as well')
+.description('failure breakdown of a run: failed cases and iterations, failed steps, errors, stack traces and logs')
+.action((runId, opts) => {
+    noCommandExecuted = false;
+    resultsCmd.run(getAuth(), runId, opts);
 });
 
 // sync command
