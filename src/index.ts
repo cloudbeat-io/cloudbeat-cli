@@ -174,7 +174,7 @@ projectCommands
 // results commands
 const resultsCommands = program
 .command('results', { isDefault: false })
-.description('analyze failed tests: recent failures, last failure of a case or suite, failure breakdown of a run');
+.description('analyze failed tests: recent failures, failure breakdown of a run or result, all steps and logs of an iteration, case history');
 
 resultsCommands
 .command('failures')
@@ -210,6 +210,50 @@ resultsCommands
 .action((runId, opts) => {
     noCommandExecuted = false;
     resultsCmd.run(getAuth(), runId, opts);
+});
+
+resultsCommands
+.command('show <resultId>')
+.storeOptionsAsProperties(false)
+.passCommandToAction(false)
+.option('--logs <lines>', 'number of last log lines to show per failed iteration (default: 20, 0 = none)')
+.option('--all', 'include passed iterations as well')
+.description('failure breakdown of a result (ids are listed by "results failures"), same as "results run" but by result id')
+.action((resultId, opts) => {
+    noCommandExecuted = false;
+    resultsCmd.show(getAuth(), resultId, opts);
+});
+
+resultsCommands
+.command('iteration <iterationId>')
+.storeOptionsAsProperties(false)
+.passCommandToAction(false)
+.option('--screenshots <dir>', 'save screenshots of failed steps to this directory')
+.description('everything about one case iteration: parameters, every step with its failure, the full log, attachments')
+.action((iterationId, opts) => {
+    noCommandExecuted = false;
+    resultsCmd.iteration(getAuth(), iterationId, opts);
+});
+
+resultsCommands
+.command('history <caseName>')
+.storeOptionsAsProperties(false)
+.passCommandToAction(false)
+.option('--project <projectName>', 'only runs of this project')
+.option('--limit <count>', 'number of runs to show (default: 20, max: 100)')
+.option('--days <days>', 'how far back to look, in days (default: 30, max: 365)')
+.description('recent runs of a test case, newest first: when it last passed and how it failed since')
+.action((caseName, opts) => {
+    noCommandExecuted = false;
+    resultsCmd.history(getAuth(), caseName, opts);
+});
+
+resultsCommands
+.command('ai-data <resultId>')
+.description('compact text digest of a result\'s failures, the same one CloudBeat\'s "AI summarize" uses')
+.action((resultId) => {
+    noCommandExecuted = false;
+    resultsCmd.aiData(getAuth(), resultId);
 });
 
 // sync command
